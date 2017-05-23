@@ -90,13 +90,13 @@
 
 \section{MTX协议\label{sec:protocol}}
 
-\begin{center}
-\begin{figurehere}
-\includegraphics[height=10cm]{images/mtx-protocol.png}
-\caption{MTX协议：图中示例一个三边交易的撮合}
-\label{fig:mtxprotocol}
-\end{figurehere}
-\end{center}
+%\begin{center}
+%\begin{figurehere}
+%\includegraphics[height=10cm]{images/mtx-protocol.png}
+%\caption{MTX协议：图中示例一个三边交易的撮合}
+%\label{fig:mtxprotocol}
+%\end{figurehere}
+%\end{center}
 
 采用MTX协议的撮合交易过程如下：
 
@@ -112,7 +112,7 @@
 
 在传统交易所模型中，被撮合的两方中先下单的为Maker，后下单的为Taker。因为Maker创造流动性而Taker销毁流动性，因此多数交易所的成交价时候会给Maker折扣价，甚至直接采用Maker的价格作为成交价格。与之相比，MTX采用的是All-Maker模型，这是由于在去中心化环境中，很难严格界定哪个单是真正意义上最早的单，因此把所有订单都是被视为Maker既可以简化判断，又可以在计算成交价的时候不偏向任何一方，使得交易更加公平。
 
-MTX协议的另一个显著特点是消除了“交易对（Trading Pair）”的概念。一个从A到B的订单不一定要一个从B到A反向的订单才能撮合，只要有一个交换闭环被发现，就可以撮合成功。也可以说传统交易所的市场概念是多边交易闭环的一个最简单的特例。
+MTX协议的另一个显著特点是消除了“交易对（Trading Pair）”的概念。一个从A到B的订单不一定要一个从B到A反向的订单才能撮合，只要有一个交换环路被发现，就可以撮合成功。也可以说传统交易所的市场概念是多边交易闭环的一个最简单的特例。我们后续用订单中两个代币类型的组合来表示订单的类型。
 
 \subsection{定价机制\label{sec:pricediscovery}}
 
@@ -141,7 +141,7 @@ message Order {
   unit256 fee;        // 交易总费用（MTX Token），部分成交的费用按该次匹
                       // 配实际卖出货币额与outAmount比例计算。
   uint8 savingSharePercentage; // fee余额不足时支付给交易所的分润比例
-  bytes signature;    // 上面数据的ECDSA签名
+  bytes signature;    // 上面数据的ECDSA签名，也可以用作订单ID
 }	
 \end{verbatim}
 
@@ -156,6 +156,8 @@ message Match {
     bytes signature;      // 上面数据的ECDSA签名
 }
 \end{verbatim}
+
+一次撮合中包含的订单应该形成一个可交易环路，并且该环路上同一类型的订单只能有一个 --- 理论上可以将这个限制去掉，不过这会让撮合智能合约更加复杂，因此初期不予支持。放开这个限制的好处是一次撮合中将将更多订单完全成交。
 
 
 [段落：讲讲订单状态]
