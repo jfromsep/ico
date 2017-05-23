@@ -10,6 +10,7 @@
 \usepackage{xspace}
 \usepackage{graphicx}
 \usepackage{multicol}
+\usepackage{multirow}
 \usepackage{subfig}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -34,9 +35,9 @@
 \usetikzlibrary{shapes.geometric}%
 
 
-\title{MTX（Multilateral Token Exchange）Protocol\\一个以太坊代币的多边交易协议}
+\title{Multilateral Token Exchange (MTX) Protocol\\一个以太坊代币的多边交易协议}
 \author{
-    王东 <dong77@gmail.com>
+    dong77 <dong77@gmail.com>
     % \and
     % Haomin Li\\
     % lihaomin@zhongan.io
@@ -92,14 +93,28 @@
 \begin{center}
 \begin{figurehere}
 \includegraphics[height=10cm]{images/mtx-protocol.png}
-\caption{MTX交互过程示例：一个三边交易的撮合}
+\caption{MTX协议：图中示例一个三边交易的撮合}
 \label{fig:mtxprotocol}
 \end{figurehere}
 \end{center}
 
-\subsection{定价机制\label{sec:pricediscovery}}
+采用MTX协议的撮合交易过程如下：
 
-[段落：讲讲中心和交易所的定价模型，以及为什么不适合于去中心化交易所 double action vs taker maker]
+\begin{enumerate}
+	\item 用户甲，乙，丙分别对MTX撮合智能合约（Matchengine Contract）授权，授权后该合约可对用户指定代币账号做不超过一定额度的转出操作。在上面实例中，合约可最多从用户甲的账号转出1000个A，从用户乙账户转出9个B，从用户丙账户转出100个C；
+	\item 用户甲，乙，丙分别生成自己的订单，并用私钥对其进行数字签名。订单的表示不再区分买单和卖单，所有订单都可以视为是“交换单”： 甲的订单声明：甲愿意支出不多于1000个A，得到尽可能多但不少于10个B；如果是部分成交，那么A到B的兑换率不得低于1000/10，即100.0。订单中还可以包含很多其它的参数，我们在\ref{sec:dataformat}中会进一步说明；
+	\item 甲，乙，丙分别将自己的订单通过适当的方式广播或定向发送给交易所；
+	\item 交易所X1收到上述三个订单，将订单放到三个OrderBook中，并实时通过区块链数据更新订单状态。同时交易所不断计算寻找能够撮合的订单组。一旦确定三个订单的当前状态可以撮合成功，且收益（交易手续费，分润，并去除预估的以太坊gas费）满足预期，则将三个订单组装成一个撮合交易（Match Transaction）；
+	\item 交易所对撮合交易签名后发送到MTX的撮合智能合约；
+	\item 撮合智能合约验证四方签名，之后验证三个订单（的最新状态）是否可以真正成交。若无法成交，合约终止；否则智能合约分别计算出甲乙丙三方各自需要支出的金额，以及交易所X1该收取的费用，并且实时将甲乙丙账号中的资产进行互转，同时支付费用给交易所X1完成清算。在交易过程中，撮合智能合约还会调用MTX注册智能合约（Exchange Registration Contract）来检查交易所是否有权进行撮合，以及费用声明；在交易完成前，还会调用MTX统计智能合约（Trade Stats Contract）对交易所撮合统计做更新，同时更新不同代币间兑换率的变化情况。
+	\item 交易所监听新的区块，并根据其中的数据更新相关订单的状态，并根据全部的Order Book进行新一轮撮合服务。
+\end{enumerate}
+
+在传统交易所模型中，被撮合的两方中先下单的为Maker，后下单的为Taker。因为Maker创造流动性而Taker销毁流动性，因此多数交易所的成交价时候会给Maker折扣价，甚至直接采用Maker的价格作为成交价格。与之相比，MTX采用的是All-Maker模型，这是由于在去中心化环境中，很难严格界定哪个单是真正意义上最早的单，因此把所有订单都是被视为Maker既可以简化判断，又可以在计算成交价的时候不偏向任何一方，使得交易更加公平。
+
+MTX协议的另一个显著特点是消除了“交易对（Trading Pair）”的概念。一个从A到B的订单不一定要一个从B到A反向的订单才能撮合，只要有一个交换闭环被发现，就可以撮合成功。也可以说传统交易所的市场概念是多边交易闭环的一个最简单的特例。
+
+\subsection{定价机制\label{sec:pricediscovery}}
 
 [段落，讲讲我们的定价模型：我们属于double auction模型，采用中间级成交，同时讲讲交易所收费]
 
@@ -111,9 +126,36 @@
 
 \subsection{数据格式\label{sec:dataformat}}
 
-订单格式，撮合格式。
+由于采用All-Maker模型，所有订单都可以用同一个结构表示。该结构包含订单本身的各种参数数据和数字签名。在签名前，现将订单参数数据连接成一个字节数组，通过Keccak SHA3方法对这个字节数组做散列计算得到订单的哈希，之后用账户私钥对这个哈希进行ECDSA签名。
 
-\subsection{智能合约\label{sec:smartcontract}}
+
+\begin{verbatim}
+message Order {
+  address protocol;   // MTX协议入口智能合约地址
+  address owner;      // 该订单所有者（发起者）地址
+  address outToken;   // 卖出ERC20代币智能合约地址
+  address inToken;    // 买入ERC20代币智能合约地址
+  uint256 outAmount;  // 卖出ERC20代币数量
+  uint256 inAmount;   // 买入ERC20代币数量
+  unit256 expiration  // 过期时间
+  unit256 fee;        // 交易总费用（MTX Token），部分成交的费用按该次匹
+                      // 配实际卖出货币额与outAmount比例计算。
+  uint8 savingSharePercentage; // fee余额不足时支付给交易所的分润比例
+  bytes signature;    // 上面数据的ECDSA签名
+}	
+\end{verbatim}
+
+订单中虽然没有明确指定价格，但我们可以通过计算\verb|outAmount/inAmount|来得到一个订单兑换率\verb|R|。该兑换率隐含地要求所有实际撮合成交的兑换率不得大于\verb|R|。一个好的交易所UI应该允许用户指定\verb|outAmount|，\verb|inAmount|，和传统意义的买入价或卖出价这三个数据的任意两个来计算缺失的\verb|outAmount|或\verb|outAmount|值。
+
+订单实际上可以有两种不同的“完全成交”定义：一种定义是只有卖出代币达到了\verb|outAmount|才算完全成交；另一种定义在之前的基础上允许买入代币累计金额达到\verb|inAmount|也算完全成交。我们可以在订单中引入一个参数告诉交易所和撮合智能合约选择哪种完全成交定义。在第一版本的实现中，我们先支持第一种定义。
+
+\begin{verbatim}
+message Match {
+    Order[] orders;     // 该次匹配的所有订单
+    address feeRecipient; // 费用收取地址
+    bytes signature;      // 上面数据的ECDSA签名
+}
+\end{verbatim}
 
 
 [段落：讲讲订单状态]
