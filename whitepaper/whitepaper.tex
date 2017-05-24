@@ -107,13 +107,13 @@ Ripple \cite{schwartz2014ripple} 是一个去中心化的银行系统间清算�
 
 \section{MTX协议\label{sec:protocol}}
 
-%\begin{center}
-%\begin{figurehere}
-%\includegraphics[height=10cm]{images/mtx-protocol.png}
-%\caption{MTX协议：图中示例一个三边交易的撮合}
-%\label{fig:mtxprotocol}
-%\end{figurehere}
-%\end{center}
+\begin{center}
+\begin{figurehere}
+\includegraphics[height=10cm]{images/mtx-protocol.png}
+\caption{MTX协议：图中示例一个三边交易的撮合}
+\label{fig:mtxprotocol}
+\end{figurehere}
+\end{center}
 
 采用MTX协议的撮合交易过程如下：
 
@@ -157,6 +157,19 @@ $$
 \text{总利润} = \sum^{n-1}_{i=0}fee_{i}+(Amt'_{i}-Amt_{i})*x\%\text{。}
 $$
 交易所在撮合时会综合考虑这两方面的收入做出撮合交易的决策，以优化利润总额。
+
+(王辉：这个地方$(Amt)$概念有点模糊，能否用实际成交额 T，订单卖出代币余额O, 订单兑换率R，和实际兑换率R'来计算，这样分成就是就是 Max(O - T*R', T(R-R')*feePercentage) )
+
+\subsection{交易环路\label{sec:tradecircle}}
+
+协议要求一个合法的交易环路必须具有下列属性：
+
+\begin{itemize}
+	\item 它的订单子集无法组成更小的可交易环路；
+	\item 它上面订单的兑换率之积不大于1；
+\end{itemize}
+
+\subsection{市场深度计算\label{sec:pricediscovery}}
 
 \subsection{数据格式\label{sec:dataformat}}
 
@@ -228,6 +241,8 @@ message Match {
 
 [段落：交易所的初创成本]
 
+
+[段落：如何激励转发订单？？？]
 
 \section{协议代币\label{sec:exchangetoken}}
 
