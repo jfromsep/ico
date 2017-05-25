@@ -130,22 +130,31 @@ Openledger是一个新型去中心化交易平台。它允许用户将比特币�
 	\item 交易所X1收到上述三个订单，将订单放到三个OrderBook中，并实时通过区块链数据更新订单状态。同时交易所不断计算寻找能够撮合的订单组。一旦确定三个订单的当前状态可以撮合成功，且收益（交易手续费，分润，并去除预估的以太坊gas费）满足预期，则将三个订单组装成一个撮合交易（Match Transaction）；
 	\item 交易所对撮合交易签名后发送到MTX的撮合智能合约；
 	\item 撮合智能合约验证四方签名，之后验证三个订单（的最新状态）是否可以真正成交。若无法成交，合约终止；否则智能合约分别计算出甲乙丙三方各自需要支出的金额，以及交易所X1该收取的费用，并且实时将甲乙丙账号中的资产进行互转，同时支付费用给交易所X1完成清算。在交易过程中，撮合智能合约还会调用MTX注册智能合约（Exchange Registration Contract）来检查交易所是否有权进行撮合，以及费用声明；在交易完成前，还会调用MTX统计智能合约（Trade Stats Contract）对交易所撮合统计做更新，同时更新不同代币间兑换率的变化情况。
-	\item 交易所监听新的区块，并根据其中的数据更新相关订单的状态，并根据全部的Order Book进行新一轮撮合服务。
+	\item 交易所监听新的区块，并根据其中的数据更新相关订单的状态，并根据全部的Orderbook进行新一轮撮合服务。
 \end{enumerate}
 
 在传统交易所模型中，被撮合的两方中先下单的为Maker，后下单的为Taker。因为Maker创造流动性而Taker销毁流动性，因此多数交易所的成交价时候会给Maker折扣价，甚至直接采用Maker的价格作为成交价格。与之相比，MTX采用的是All-Maker模型，这是由于在去中心化环境中，很难严格界定哪个单是真正意义上最早的单，因此把所有订单都是被视为Maker既可以简化判断，又可以在计算成交价的时候不偏向任何一方，使得交易更加公平。
 
 MTX协议的另一个显著特点是消除了“交易对（Trading Pair）”的概念。一个从A到B的订单不一定要一个从B到A反向的订单才能撮合，只要有一个交换环路被发现，就可以撮合成功。也可以说传统交易所的市场概念是多边交易闭环的一个最简单的特例。我们后续用订单中两个代币类型的组合来表示订单的类型。
 
-\subsection{定价机制\label{sec:pricediscovery}}
+\subsection{交易环路\label{sec:tradecircle}}
 
-本节将介绍撮合交易中的定价机制，我们由一个包含三笔订单的可交易环路为例开始介绍，然后引入更一般的情形。
+协议要求一个合法的交易环路必须具有下列属性：
 
-假定有三个币种$A$、$B$和$C$，存在三笔订单：$A\rightarrow B$、$B \rightarrow C$和$C \rightarrow A$，那么就可以形成环路$A\rightarrow B \rightarrow C \rightarrow A$，完成一次跨币种撮合。下面我们对交易环路中的成交价格进行讨论。
+\begin{itemize}
+	\item 它的订单子集无法组成更小的可交易环路；
+	\item 它上面订单的兑换率之积不大于1；
+\end{itemize}
 
-\subsubsection{成交价格}
 
-令 $P_{A \rightarrow B}$、$P_{B \rightarrow C}$、$P_{C \rightarrow A}$ 分别为这三笔订单的买入价。很容易证明，如果$P_{A \rightarrow B}\cdot P_{B \rightarrow C}\cdot P_{C \rightarrow A}=1$，那么恰好可以买入价完成撮合。当$P_{A \rightarrow B}\cdot P_{B \rightarrow C}\cdot P_{C \rightarrow A}>1$时，可以较低买入价完成撮合，即产生折价。
+
+接下类我们介绍可以撮合成交的交易环路的定义和限制，成交价，成交量，和交易所收益模型。为了方便读者理解，我们由一个包含三笔订单的交易环路为例开始，然后引入更一般的情形。
+
+假定有三个币种$A$、$B$和$C$，存在三笔订单：$A\rightarrow B$、$B \rightarrow C$和$C \rightarrow A$，那么就可以形成环路$A\rightarrow B \rightarrow C \rightarrow A$，完成一次跨币种撮合。下面我们对交易环路中的成交价，成交量，和交易所收费做进一步阐述。
+
+\subsection{成交价模型\label{sec:pricemodel}}
+
+令 $P_{A \rightarrow B}$、$P_{B \rightarrow C}$、$P_{C \rightarrow A}$ 分别为这三笔订单的买入价。很容易证明，如果$P_{A \rightarrow B}\cdot P_{B \rightarrow C}\cdot P_{C \rightarrow A}=1$，那么三笔订单恰好可以用各自的买入价完成撮合。当$P_{A \rightarrow B}\cdot P_{B \rightarrow C}\cdot P_{C \rightarrow A}>1$时，可以用低于各自买入价的价格完成撮合，即产生折价。
 
 
 
@@ -159,7 +168,7 @@ MTX协议的另一个显著特点是消除了“交易对（Trading Pair）”�
 
 %当成交价低于买入价时，撮合能够产生利润。
 
-交易环路的折价需要平摊到这三笔买单，假定三笔订单均得$x\%$的折价，那么最终完成撮合时，三笔订单的成交价分别为：$P_{A \rightarrow B}\cdot (1-x\%)$，$P_{B \rightarrow C}\cdot (1-x\%)$，$P_{C \rightarrow A}\cdot (1-x\%)$。下面我们给出$x\%$的计算方法，以折后价格完成撮合需满足
+MTX协议要求交易环路的折价要公平地分摊到每笔订单中。假定三笔订单均得$x\%$的折价，那么最终完成撮合时，三笔订单的成交价分别为：$P_{A \rightarrow B}\cdot (1-x\%)$，$P_{B \rightarrow C}\cdot (1-x\%)$，$P_{C \rightarrow A}\cdot (1-x\%)$。折后价格完成撮合需满足：
 \begin{equation}\label{match}
 P_{A \rightarrow B}\cdot (1-x\%)\cdot P_{B \rightarrow C}\cdot (1-x\%)\cdot P_{C \rightarrow A}\cdot (1-x\%) = 1\text{，}
 \end{equation}
@@ -169,16 +178,16 @@ x\%= 1- \frac{1}{\sqrt[3]{P_{A \rightarrow B}\cdot P_{B \rightarrow C}\cdot P_{C
 \end{equation*}
 在更一般的情形下，如果跨$n$个币种$C_{0}$, …,$C_{n-1}$ 的撮合，那么我们有
 \begin{equation*}
-x\%= 1- \frac{1}{\sqrt[n]{\prod_{i=0}^{n-1} P_{C_{i\mod n} \rightarrow C_{i+1\mod n}}}}\text{。}
+x\%= 1- \frac{1}{\sqrt[n]{\prod_{i=0}^{n-1} P_{C_{(i\mod n)} \rightarrow C_{((i+1)\mod n)}}}}\text{。}
 \end{equation*}
 
-显然，$\prod_{i=0}^{n-1} P_{C_{i\mod n} \rightarrow C_{i+1\mod n}}$ 越大，订单的折价$x\%$越高。因此为了找到具有最高折价的闭环，只需要考虑每个order book中买入价最高的订单。
+显然，$\prod_{i=0}^{n-1} P_{C_{(i\mod n)} \rightarrow C_{((i+1)\mod n)}}$ 越大，订单的折价$x\%$越高。因此为了找到具有最高折价的闭环，只需要考虑每个Orderbook中买入价最高的订单。
 
 
-\subsubsection{成交量模型}
+\subsection{成交量模型}
 每个交易环路都是有多个订单组成，而每个订单都会有不同的交易数量，交易数量最小的那个订单会直接影响整个闭环的最终成交数量。当这个交易环路撮合完成后，交易数量最小的这个订单就完全成交了。
 
-假定$A \rightarrow B$、$B \rightarrow C$、$C \rightarrow A$三个订单中，卖出代币的数量分别为$n_{A}$、 $n_{B}$、 $n_{C}$，而最终成交的卖出代币数量分别为$N_{A}$、 $N_{B}$、 $N_{C}$。
+假定$A \rightarrow B$、$B \rightarrow C$、$C \rightarrow A$三个订单中，卖出代币的数量分别为$n_{A}$、 $n_{B}$、 $n_{C}$（注意“卖出代币数量并不一定是原始订单中的卖出代币数量，而是订单当前状态的卖出代币数量，参见\ref{sec:orderstatus}），而最终成交的卖出代币数量分别为$N_{A}$、 $N_{B}$、 $N_{C}$。
 
 \begin{theorem}
 如果$A \rightarrow B$是三个订单中交易数量最小的，那么$n_{A} = N_{A}$。
@@ -202,10 +211,10 @@ N_{A}&=\min(n_{A},\frac{N_{C}}{P_{C \rightarrow A}*(1-x\%)})\\
 根据Eq. ( \ref{match} ) 可以得出 $N_{A}=n_{A}$。
 \end{proof}
 
-\subsubsection{交易所收益}
+\subsection{撮合收益模型}
 在整个生态中，负责撮合的交易所处于核心地位。为了鼓励交易所更高效的完成撮合，我们设计了一套针对交易所的经济激励机制。交易所的收入来自两部分：一部分是来自订单的手续费，每一个订单都需要支付一定代币作为手续费，手续费是奖励给交易所的，以激励交易所撮合更多的订单；另一部分是撮合交易环路的利润提成，当交易环路产生利润时，交易所可以按比例从中获得提成，以激励交易所撮合利润更高的交易环路。
 
-如果，交易所上传一个交易环路$C_0 \rightarrow C_1 \rightarrow ... \rightarrow C_{n-1} \rightarrow C_{0}$ 并撮合成功，令每一单$C_{i}\rightarrow C_{i+1\mod n}$$(i\in{0,...,n-1})$对应的手续费是$fee_{i}$，那么交易所的手续费收入则为
+如果，交易所上传一个交易环路$C_0 \rightarrow C_1 \rightarrow ... \rightarrow C_{n-1} \rightarrow C_{0}$ 并撮合成功，令每一单$C_{i}\rightarrow C_{(i+1\mod n)}$$(i\in{0,...,n-1})$对应的手续费是$fee_{i}$，那么交易所的手续费收入则为
 $
 \sum^{n-1}_{i=0}fee_{i}\text{。}
 $
@@ -228,16 +237,8 @@ $$
 
 当然交易所也可以只对冲其中一笔订单，但是这种对冲方法不是无风险对冲，因此不在我们考虑范围内。因此，如果交易所要通过无风险套利窃取闭环的利润，那么它上传的环路必然包含子环路。因此，我们规定，{\bfseries 合法的闭环必须保证其订单子集无法组成更小的可交易环路}。
 
-\subsection{交易环路\label{sec:tradecircle}}
 
-协议要求一个合法的交易环路必须具有下列属性：
-
-\begin{itemize}
-	\item 它的订单子集无法组成更小的可交易环路；
-	\item 它上面订单的兑换率之积不大于1；
-\end{itemize}
-
-\subsection{市场深度计算\label{sec:pricediscovery}}
+\subsection{市场深度计算\label{sec:pricemodel}}
 
 \subsection{数据格式\label{sec:dataformat}}
 
@@ -291,7 +292,7 @@ message Match {
 [段落：token兑换率统计合约]
 
 
-\subsection{交易所\label{sec:exchange}}
+\section{交易所\label{sec:exchange}}
 
 交易所为用户提供的核心价值是价格发现和交易撮合。交易所的价格发现服务通过汇聚尽可能多的订单，并且对订单进行状态追踪和更新，按照兑换率排序形成多个全局的多Orderbook，同时根据多个Orderbook，计算出任何两个代币之间的兑换率历史和特定的统计指标，比如最新兑换率，滑动成交趋势等等。交易撮合服务建立在价格发现服务的基础之上，通过优化多边交易环路发现算法，尽可能快地将撮合提交到以太坊区块链，通过智能合约做撮合验证和清算。我们预测交易所的第三个重要服务是代币发行和承兑服务，将以太坊链外资产引入到以太坊网络。不过这个服务和本文的协议相关性不大，我们不做进一步阐释。
 
