@@ -41,10 +41,9 @@
 
 \title{Multilateral Token Exchange (MTX) Protocol\\一个以太坊代币的多边交易协议\\（草稿 v0.01）}
 \author{ 
-    dong77@gmail.com
-    % \and
-    % Haomin Li\\
-    % lihaomin@zhongan.io
+    dong77@gmail.com\\
+%    \and
+    fdwanghui@gmail.com    % lihaomin@zhongan.io
 }
 
 \makeatletter
@@ -86,6 +85,10 @@
 基于区块链的去中心化交易机制就是为了彻底解决上述问题。去中心化交易的核心优势之一是避免任何资产被托管，因此资产就不存在被盗的可能性，这会极大降低用户对交易所的信任成本；这种交易机制的另一个优势是没有地缘和时间限制，以及极高的透明性和可追溯性。这些特点会促使交易整体具有更大的流动性和更小的买卖价差。
 
 \section{相关工作\label{sec:existingworks}}
+\section{相关工作}
+
+%[几个段落：介绍早期区块链上交易所的尝试，特别是Ripple 的机制。]
+
 此前，社区已经有过一些基于区块链搭建去中心化的交易所的尝试，如ripple、比特股、Openledger等。这些项目通过不同的方法实现虚拟资产交易，优化性能。
 
 Ripple \cite{schwartz2014ripple} 是一个去中心化的银行系统间清算协议，为方便的在全世界范围转账支付而设计的，具有快速、方便、超低费用的优点。Ripple提出了一项Interledger \cite{thomas2015protocol} 协议（ILP）实现跨账本的资产交易，无论是分布式的，还是传统的中心化账本。ILP 本身并不是一个账本，相反，它提供了一个顶层加密托管系统，在称之为“连接者”的中介机构的帮助下，可以让资金在各账本之间进行流动。
@@ -105,16 +108,6 @@ Openledger是一个新型去中心化交易平台。它允许用户将比特币�
 %[一个稍长的段落：介绍0x协议，指明其缺点，比如：1）taker负责匹配订单，要求taker在线，撮合实时性差因此撮合价格无法及时优化，2）实际就是简单的OTC方式，没法实现复杂订单的撮合，3）交易所之间没有明确的竞争激励机制，4）没有考虑旷工的利益。]
 
 0x \cite{warren20170x} 是一个可以在以太坊区块链上进行 ERC20 代币对等交易的开放式协议。该协议旨在成为通用开放标准，作为可与其他协议组合的基本模块，用以驱动越来越复杂的区块链应用程序。由于它使用的是公开访问的智能合约系统，因此可以作为各种 dApps 的共享基础架构。而从长远来看，开放式技术标准相比封闭模式具有更大的优势，随着每个月有更多的资产在区块链上被代币化，也有更多的 dApps 需要使用这些不同的代币，开放式标准也因此变得更加重要。此外，由 dApps 耦合到其底层协议所导致的智能合约冗余也是未来区块链协议开发的主要障碍，因此在标准化之余，我们还需要一个合适的解耦方式。0x 协议试图将信息交换功能从应用层拉到协议层，推动 dApps 之间的互操作性。然而，0x协议具有以下局限性：taker必须在线匹配订单，这导致撮合实时性差，难以优化成交价格；0x协议采用的是简单的OTC方式，无法法实现复杂订单的撮合；不同交易所之间没有明确的竞争激励机制；没有考虑了矿工的利益。
-
-
-%[几个段落：介绍早期区块链上交易所的尝试，特别是Ripple的机制。
-%
-%
-%[几个段落：介绍一些automatic market maker算法，包括Bancor协议，{Price Evolution in a Continuous Double Auction Prediction Market With a Scoring-Rule Based Market Maker}， {Hanson, R. 2003a. Book orders for market scoring rules. George Manson University.}]
-%
-%[一个稍长的段落：介绍0x协议，指明其缺点，比如：1）taker负责匹配订单，要求taker在线，撮合实时性差因此撮合价格无法及时优化，2）实际就是简单的OTC方式，没法实现复杂订单的撮合，3）交易所之间没有明确的竞争激励机制，4）没有考虑旷工的利益。]
-
-我们受0x协议和闪电网络的启发，提出一个以太坊上ERC20代币间交易协议。通过该协议，代币持有者可以通过数字签名授权指定的一个或多个交易所帮助自己撮合订单，并将该订单在链下广播给交易所；交易所会使用与MTX智能合约中相同的逻辑对多个订单进行匹配，通过数字签名生成区块链交易，并负责将交易广播到以太坊网络，并通过触发智能合约实时完成代币在相关交易方间的清算和转账。
 
 \section{MTX协议设计\label{sec:protocol}}
 
@@ -145,86 +138,128 @@ MTX协议的另一个显著特点是消除了“交易对（Trading Pair）”�
 接下类我们介绍可以撮合成交的交易环路的定义和限制，成交价，成交量，和交易所收益模型。为了方便读者理解，我们由一个包含三笔订单的交易环路为例开始，然后引入更一般的情形。
 
 
-\subsection{订单的归约性}
+\subsection{符号定义}
 
-blahblah
+在正式介绍协议之前，我们要介绍一些符号的定义。
+\[
+\begin{split}
+&C_{i}\text{ ：}\text{编号为$i$的代币币种。}\\
+&O_{C_{i}\rightarrow C_{j}}\text{：}\text{用代币$C_{i}$买入代币$C_{j}$的订单。}\\
+&P_{O_{C_{i}\rightarrow C_{j}}}\text{：}\text{为订单$O_{C_{i}\rightarrow C_{j}}$的买入价。}\\
+&B_{O_{C_{i}\rightarrow C_{j}}}\text{：}\text{为订单$O_{C_{i}\rightarrow C_{j}}$需要买入代币$C_{j}$的数量。}\\
+&S_{O_{C_{i}\rightarrow C_{j}}}\text{：}\text{为购买$B_{O_{C_{i}\rightarrow C_{j}}}$个$C_{j}$，需要花费的代币$C_{i}$的数量。
+}
+\end{split}
+\]
+显然，$S_{O_{C_{i}\rightarrow C_{j}}} = B_{O_{C_{i}\rightarrow C_{j}}}\cdot P_{O_{C_{i}\rightarrow C_{j}}}$。
+\subsection{订单的可规约性}
+
+交易所除了简单的两个货币对之间的买卖撮合，还能能够利用多个货币对建立一条路径，在两种原本没有直接交易对手的货币间下完成最优价兑换。针对这种订单路径，我们介绍一种重要特定——可规约性。我们以三个币种为例展开介绍，后面会扩展到更一般的情形。
+
+给定三个币种$C_{0}$、$C_{1}$、$C_{2}$和两个订单$O_{C_{0}\rightarrow C_{1}}$和$O_{C_{1}\rightarrow C_{2}}$。当$B_{O_{C_{0}\rightarrow C_{1}}} = B_{O_{C_{1}\rightarrow C_{2}}}\cdot P_{O_{C_{1}\rightarrow C_{2}}}$ 时，两个订单可以规约为一个订单$O_{C_{0}\rightarrow C_{2}}$，规约后的订单买入$C_{2}$代币数量$B_{O_{C_{0}\rightarrow C_{2}}} = B_{O_{C_{1}\rightarrow C_{2}}}$，花费$C_{0}$代币数量$S_{O_{C_{0}\rightarrow C_{2}}} = S_{O_{C_{0}\rightarrow C_{1}}}$，很容易证明这个订单的买入价为$P_{O_{C_{0}\rightarrow C_{n-1}}}=P_{O_{C_{0}\rightarrow C_{1}}}\cdot P_{O_{C_{1}\rightarrow C_{2}}}$。
+
+\begin{definition}[订单的可规约性]
+考虑更一般的情形，如果有$n$个币种$C_{0}$, ...,$C_{n-1}$，和$n-1$个订单$O_{C_{0}\rightarrow C_{1}}$,... ,$O_{C_{i}\rightarrow C_{i+1}}$, ..., $O_{C_{n-2}\rightarrow C_{n-1}}$。如果成交数量满足要求，那么这些订单可以规约为一个订单$O_{C_{0}\rightarrow C_{n-1}}$，其中$B_{O_{C_{0}\rightarrow C_{n-1}}}=B_{O_{C_{n-2}\rightarrow C_{n-1}}}$， $S_{O_{C_{0}\rightarrow C_{n-1}}}=S_{O_{C_{0}\rightarrow C_{1}}}$， 并满足
+$$
+P_{O_{C_{0}\rightarrow C_{n-1}}}=\prod_{i=0}^{n-2}P_{O_{C_{i}\rightarrow C_{i+1}}}\text{。}\\
+$$
+\end{definition}
+
+可规约性可以帮助我们在分析订单路径时简化模型，在后文的讨论中，起着重要作用。
+
+\subsection{定价机制}
+
+传统撮合系统是在两个币种间完成撮合，下面我们将撮合的概念扩展到多币种，并给出交易环路的定义。
+\begin{definition}[交易环路]
+假定有$n$个币种$C_{0}$、$C_{1}$、...、$C_{n-1}$，存在$n$笔订单
+\[ \begin{split}
+&O_{C_{0}\rightarrow C_{1}}\\
+&O_{C_{1} \rightarrow C_{2}}\\
+&\ldots\\
+&O_{C_{n-2} \rightarrow C_{n-1}}\\
+&O_{C_{n-1} \rightarrow C_{0}}\text{}
+\end{split} \]
+那么这些订单可以组成跨币种$C_{0}\rightarrow C_{1} \rightarrow ... \rightarrow C_{n-1} \rightarrow C_{0}$的交易环路。
+\end{definition}
+
+当这些订单的价格\textbf{满足一定条件时}，我们可以对整个交易环路进行撮合，这种交易环路称为\textbf{可交易环路}。下面我们对交易环路中的成交价格和成交量进行讨论。
 
 
-假定有三个币种$A$、$B$和$C$，存在三笔订单：$A\rightarrow B$、$B \rightarrow C$和$C \rightarrow A$，那么就可以形成环路$A\rightarrow B \rightarrow C \rightarrow A$，完成一次跨币种撮合。下面我们对交易环路中的成交价，成交量，和交易所收费做进一步阐述。
+\subsubsection{成交价格}
 
-\subsection{成交价模型\label{sec:pricemodel}}
+本节将介绍撮合交易中的定价机制，我们由一个包含三笔订单的可交易环路为例开始介绍，然后引入更一般的情形。
 
-令 $P_{A \rightarrow B}$、$P_{B \rightarrow C}$、$P_{C \rightarrow A}$ 分别为这三笔订单的买入价。很容易证明，如果$P_{A \rightarrow B}\cdot P_{B \rightarrow C}\cdot P_{C \rightarrow A}=1$，那么三笔订单恰好可以用各自的买入价完成撮合。当$P_{A \rightarrow B}\cdot P_{B \rightarrow C}\cdot P_{C \rightarrow A}>1$时，可以用低于各自买入价的价格完成撮合，即产生折价。
+假定有三个币种$C_{0}$、$C_{1}$和$C_{2}$，存在三笔订单：$O_{C_{0}\rightarrow C_{1}}$、$O_{C_{1} \rightarrow C_{2}}$和$O_{C_{2} \rightarrow C_{0}}$，那么这三个订单组成交易环路$C_{0}\rightarrow C_{1} \rightarrow C_{2} \rightarrow C_{0}$。下面我们对交易环路中的成交价格进行讨论。
+
+令 $P_{O_{C_{0} \rightarrow C_{1}}}$、$P_{O_{C_{1} \rightarrow C_{2}}}$、$P_{O_{C_{2} \rightarrow C_{0}}}$ 分别为这三笔订单的买入价。很容易证明，如果$P_{O_{C_{0} \rightarrow C_{1}}}\cdot P_{O_{C_{1} \rightarrow C_{2}}}\cdot P_{O_{C_{2} \rightarrow C_{0}}}=1$，那么恰好可以买入价完成撮合。当$P_{O_{C_{0} \rightarrow C_{1}}}\cdot P_{O_{C_{1} \rightarrow C_{2}}}\cdot P_{O_{C_{2} \rightarrow C_{0}}}>1$时，可以较低买入价完成撮合，即产生折价。
 
 
-MTX协议要求交易环路的折价要公平地分摊到每笔订单中。假定三笔订单均得$x\%$的折价，那么最终完成撮合时，三笔订单的成交价分别为：$P_{A \rightarrow B}\cdot (1-x\%)$，$P_{B \rightarrow C}\cdot (1-x\%)$，$P_{C \rightarrow A}\cdot (1-x\%)$。折后价格完成撮合需满足：
+交易环路的折价需要平摊到这三笔买单，假定三笔订单均获得$x\%$的下折，那么最终完成撮合时，三笔订单的成交价分别为：$P_{O_{C_{0} \rightarrow C_{1}}}\cdot (1-x\%)$，$P_{O_{C_{1} \rightarrow C_{2}}}\cdot (1-x\%)$，$P_{O_{C_{2} \rightarrow C_{0}}}\cdot (1-x\%)$。下面我们给出$x\%$的计算方法。以折后价格完成撮合需满足
 \begin{equation}\label{match}
-P_{A \rightarrow B}\cdot (1-x\%)\cdot P_{B \rightarrow C}\cdot (1-x\%)\cdot P_{C \rightarrow A}\cdot (1-x\%) = 1\text{，}
+P_{O_{C_{0} \rightarrow C_{1}}}\cdot (1-x\%)\cdot P_{O_{C_{1} \rightarrow C_{2}}}\cdot (1-x\%)\cdot P_{O_{C_{2} \rightarrow C_{0}}}\cdot (1-x\%) = 1\text{，}
 \end{equation}
 根据上式我们可以推导出
 \begin{equation*}
-x\%= 1- \frac{1}{\sqrt[3]{P_{A \rightarrow B}\cdot P_{B \rightarrow C}\cdot P_{C \rightarrow A}}}\text{。}
+x\%= 1- \frac{1}{\sqrt[3]{P_{O_{C_{0} \rightarrow C_{1}}}\cdot P_{O_{C_{1} \rightarrow C_{2}}}\cdot P_{O_{C_{2} \rightarrow C_{0}}}}}\text{。}
 \end{equation*}
-在更一般的情形下，如果跨$n$个币种$C_{0}$, …,$C_{n-1}$ 的撮合，那么我们有
+在更一般的情形下，如果跨$n$个币种$C_{0}$, …,$C_{n-1}$ 的撮合，那么
 \begin{equation*}
-x\%= 1- \frac{1}{\sqrt[n]{\prod_{i=0}^{n-1} P_{C_{(i\mod n)} \rightarrow C_{((i+1)\mod n)}}}}\text{。}
+x\%= 1- \frac{1}{\sqrt[n]{\prod_{i=0}^{n-1} P_{C_{i\mod n} \rightarrow C_{i+1\mod n}}}}\text{。}
 \end{equation*}
 
-显然，$\prod_{i=0}^{n-1} P_{C_{(i\mod n)} \rightarrow C_{((i+1)\mod n)}}$ 越大，订单的折价$x\%$越高。因此为了找到具有最高折价的闭环，只需要考虑每个Orderbook中买入价最高的订单。
+显然，$\prod_{i=0}^{n-1} P_{O_{C_{i\mod n} \rightarrow C_{i+1\mod n}}}$ 越大，折价$x\%$越高。因此为了找到具有最高折价的交易环路，只需要考虑每个order book中买入价最高的订单。
 
 
-\subsection{成交量模型}
+\subsubsection{成交量模型}
 每个交易环路都是有多个订单组成，而每个订单都会有不同的交易数量，交易数量最小的那个订单会直接影响整个闭环的最终成交数量。当这个交易环路撮合完成后，交易数量最小的这个订单就完全成交了。
 
-假定$A \rightarrow B$、$B \rightarrow C$、$C \rightarrow A$三个订单中，卖出代币的数量分别为$n_{A}$、 $n_{B}$、 $n_{C}$ --- 注意“卖出代币数量并不一定是原始订单中的卖出代币数量，而是订单当前状态的卖出代币数量，参见章节\ref{sec:orderstate} --- 而最终成交的卖出代币数量分别为$N_{A}$、 $N_{B}$、 $N_{C}$。
+假定$O_{C_{0} \rightarrow C_{1}}$、$O_{C_{1} \rightarrow C_{2}}$、$O_{C_{2} \rightarrow C_{0}}$三个订单中，卖出代币的数量分别为$S_{O_{C_{0}\rightarrow C_{1}}}$、 $S_{O_{C_{1}\rightarrow C_{2}}}$、 $S_{O_{C_{2}\rightarrow C_{0}}}$，而最终成交的卖出代币数量分别为$S’_{O_{C_{0}\rightarrow C_{1}}}$、 $S’_{O_{C_{1}\rightarrow C_{2}}}$、 $S’_{O_{C_{2}\rightarrow C_{0}}}$。下面的定理证明了，整个交易环路撮合成交数量决定于交易数量最小的那个订单。
+
 
 \begin{theorem}
-如果$A \rightarrow B$是三个订单中交易数量最小的，那么$n_{A} = N_{A}$。
+如果$S_{O_{C_{0}\rightarrow C_{1}}} = \min( {S_{O_{C_{0}\rightarrow C_{1}}},S_{O_{C_{1}\rightarrow C_{2}}},S_{O_{C_{2}\rightarrow C_{0}}}})$，那么$S_{O_{C_{0}\rightarrow C_{1}}} = S'_{O_{C_{0}\rightarrow C_{1}}}$。
 \end{theorem}
 
+
 \begin{proof}
-假设$A \rightarrow B$完全成交，那么可以兑换$\frac{n_{A}}{P_{A \rightarrow B}*(1-x\%)}$份额的数字货币B。因此，$B \rightarrow C$可以成交的货币B总金额为
-
-$$N_{B}=\min(n_{B},\frac{n_{A}}{P_{A \rightarrow B}*(1-x\%)})=\frac{n_{A}}{P_{A \rightarrow B}*(1-x\%)}\text{。}$$
-同理,$C \rightarrow A$可以成交的货币C 总金额为
-
+假设$O_{C_{0} \rightarrow C_{1}}$完全成交，那么可以兑换$\frac{S_{O_{C_{0}\rightarrow C_{1}}}}{P_{C_{0} \rightarrow C_{1}}*(1-x\%)}$份额的数字货币$C_{1}$。因此，$C_{1} \rightarrow C_{2}$可用于交易的代币$C_{1}$数量为
+$$S'_{O_{C_{1}\rightarrow C_{2}}}=\min(S_{O_{C_{1}\rightarrow C_{2}}},\frac{S_{O_{C_{0}\rightarrow C_{1}}}}{P_{C_{0} \rightarrow C_{1}}*(1-x\%)})=\frac{S_{O_{C_{0}\rightarrow C_{1}}}}{P_{C_{0} \rightarrow C_{1}}*(1-x\%)}\text{。}$$
+同理,$C_{2} \rightarrow C_{0}$可用于交易的代币$C_{2}$ 数量为
 \[ \begin{split}
-N_{C}&=\min(n_{C},\frac{N_{B}}{P_{B \rightarrow C}*(1-x\%)})\\
-&=\frac{n_{A}}{P_{A \rightarrow B}*(1-x\%)*P_{B \rightarrow C}*(1-x\%)}\text{。}
+S'_{O_{C_{2}\rightarrow C_{0}}}&=\min(S_{O_{C_{2}\rightarrow C_{0}}},\frac{S'_{O_{C_{1}\rightarrow C_{2}}}}{P_{C_{1} \rightarrow C_{2}}*(1-x\%)})\\
+&=\frac{S_{O_{C_{0}\rightarrow C_{1}}}}{P_{C_{0} \rightarrow C_{1}}*(1-x\%)*P_{C_{1} \rightarrow C_{2}}*(1-x\%)}\text{。}
 \end{split} \]
-同理,$A \rightarrow B$可以成交的货币A总金额为
+同理,$C_{0} \rightarrow C_{1}$可用于交易的代币$C_{0}$ 数量为
 \[ \begin{split}
-N_{A}&=\min(n_{A},\frac{N_{C}}{P_{C \rightarrow A}*(1-x\%)})\\
-&=\frac{n_{A}}{P_{A \rightarrow B}*(1-x\%)*P_{B \rightarrow C}*(1-x\%)*P_{C \rightarrow A}*(1-x\%)}\text{。}
+S'_{O_{C_{0}\rightarrow C_{1}}}&=\min(S_{O_{C_{0}\rightarrow C_{1}}},\frac{S'_{O_{C_{2}\rightarrow C_{0}}}}{P_{C_{2} \rightarrow C_{0}}*(1-x\%)})\\
+&=\frac{S_{O_{C_{0}\rightarrow C_{1}}}}{P_{C_{0} \rightarrow C_{1}}*(1-x\%)*P_{C_{1} \rightarrow C_{2}}*(1-x\%)*P_{C_{2} \rightarrow C_{0}}*(1-x\%)}\text{。}
 \end{split} \]
-根据公式\ref{match}可以得出 $N_{A}=n_{A}$。
+根据Eq. ( \ref{match} ) 可以得出 $S'_{O_{C_{0}\rightarrow C_{1}}}=S_{O_{C_{0}\rightarrow C_{1}}}$。
 \end{proof}
 
-\subsection{撮合收益模型}
+\subsubsection{交易所收益}
 在整个生态中，负责撮合的交易所处于核心地位。为了鼓励交易所更高效的完成撮合，我们设计了一套针对交易所的经济激励机制。交易所的收入来自两部分：一部分是来自订单的手续费，每一个订单都需要支付一定代币作为手续费，手续费是奖励给交易所的，以激励交易所撮合更多的订单；另一部分是撮合交易环路的利润提成，当交易环路产生利润时，交易所可以按比例从中获得提成，以激励交易所撮合利润更高的交易环路。
 
-如果，交易所上传一个交易环路$C_0 \rightarrow C_1 \rightarrow ... \rightarrow C_{n-1} \rightarrow C_{0}$ 并撮合成功，令每一单$C_{i}\rightarrow C_{(i+1\mod n)}$$(i\in{0,...,n-1})$对应的手续费是$fee_{i}$，那么交易所的手续费收入则为
+如果，交易所上传一个交易环路$C_0 \rightarrow C_1 \rightarrow ... \rightarrow C_{n-1} \rightarrow C_{0}$ 并撮合成功，令每一单$O_{C_{i}\rightarrow C_{i+1\mod n}}$$(i\in{0,...,n-1})$对应的手续费是$fee_{i}$，那么交易所的手续费收入则为
 $
 \sum^{n-1}_{i=0}fee_{i}\text{。}
 $
-交易所的另一部分收入来自于撮合交易的利润提成。如果按照原价每订单$i$够成交$Amt_{i}$，而按撮合后的折价能够成交$Amt'_{i}$，那么交易所就可以从每一单的利润中获得$(Amt'_{i}-Amt_{i})*x\%$的提成，其中$x\%$是提成的比例,因此交易所的撮合交易提成是
-$
-\sum^{n-1}_{i=0}(Amt'_{i}-Amt_{i})*x\%\text{。}
-$
-因此交易所的总利润为
+
+交易所的另一部分收入来自于撮合交易的利润提成。假定交易环路撮合完成后，第$i$个订单$O_{C_{i-1}\rightarrow C_{i}}$成功购买了$B'_{O_{C_{i-1}\rightarrow C_{i}}}$数额的代币$C_{i}$。如果按照订单买入价，需要$Amt_{i}=B'_{O_{C_{i-1}\rightarrow C_{i}}}\cdot P_{O_{C_{i-1}\rightarrow C_{i}}}$的代币$C_{i-1}$才能完成交易，而按撮合后的折价只需要$Amt'_{i}=B'_{O_{C_{i-1}\rightarrow C_{i}}}\cdot P_{O_{C_{i-1}\rightarrow C_{i}}} \cdot (1-x\%)$，订单的发起人从中节省了$\Delta Amt_{i}=Amt_{i}-Amt'_{i}=B'_{O_{C_{i-1}\rightarrow C_{i}}}\cdot P_{O_{C_{i-1}\rightarrow C_{i}}} \cdot x\%$。交易所可以按照一定比例从$\Delta Amt_{i}$获得提成。假设提成比率为$y\%$，那么提成为$B'_{O_{C_{i-1}\rightarrow C_{i}}}\cdot P_{O_{C_{i-1}\rightarrow C_{i}}} \cdot x\% \cdot y\%$。注意：在提成的过程中，还需要综合考虑账户的余额，提成金额不可超过账户买入代币余额。
+
+综合两方面，
 $$
-\text{总利润} = \sum^{n-1}_{i=0}fee_{i}+(Amt'_{i}-Amt_{i})*x\%\text{。}
+\text{交易所总收入=}\sum^{n-1}_{i=0}fee_{i} + B'_{O_{C_{i-1}\rightarrow C_{i}}}\cdot P_{O_{C_{i-1}\rightarrow C_{i}}} \cdot x\% \cdot y\%\text{。}
 $$
-交易所在撮合时会综合考虑这两方面的收入做出撮合交易的决策，以优化利润总额。
+交易所在实际撮合时会综合考虑这两方面的收入做出撮合交易的决策，以优化利润总额。
 
 \subsection{防作弊机制}
 我们不允许交易所通过无风险套利窃取闭环的利润，本节我们将介绍如何防止交易所的这种行为。在介绍之前，我们首先来分析交易所如何做到无风险套利。
-\begin{definition}[订单的规约]：任何一串跨越$n$个货币的订单$C_{0}\rightarrow C_{1}\rightarrow \cdots \rightarrow C_{n-1}$都可以规约成为一笔订单$C_{0} \rightarrow C_{n-1}$, 那么任何一个交易环路都可以规约到只有两个货币$A$和$B$的$A\rightarrow B\rightarrow A$的环路。令$T_{1} = A\rightarrow B$和$T_{2} = B\rightarrow A$分别为规约后的两笔订单。
-\end{definition}
 
-交易所为了自身利益最大化（而不是将折价公平分摊给交易环路上的订单），可以同时生成两个新订单$T'_{1} = B\rightarrow A$和$T'_{2} = A\rightarrow B$，在一个交易环路$<T_{1}$,$T_{2}$,$T'_{1}$,$T'_{2}>$上分别与$T_{1}$ 和$T_{2}$作对冲，使的$x\%==0$，从而让实际成交价变成$T_{1}$和$T_{2}$的买入价。这个环路一个显而易见的特性就是其中包含$<T'_{1}$与$T'_{2}>$这样的子环路。
+我们将一个可交易环路规约到只有两个货币$A$和$B$的$A\rightarrow B\rightarrow A$的环路。令$O_{A\rightarrow B}$和$O_{B\rightarrow A}$分别为规约后的两笔订单。交易所可能做出以下作弊行为，无风险套取这个环路的所有利润：同时开两个订单$O'_{ B\rightarrow A}$和$O'_{ A\rightarrow B}$，与$O_{A\rightarrow B}$和$O_{B\rightarrow A}$作对冲，并将这四笔交易组成交易环路$A\rightarrow B\rightarrow A\rightarrow B\rightarrow A$来撮合。显然，这个环路包含了子环路。
 
-交易所通过生成带有子环路的撮合，可以实现低风险高收益的回报，从而有效避开协议实际成交价分摊的原则。为了防止这样的套利，我们规定，{\bfseries 合法的闭环必须保证其订单子集无法组成更小的可交易环路}。该要求可以通过以太坊智能合约简单有效地得到验证。当然交易所也可以只对冲其中一笔订单，但是这种对冲方法风险更大，我们会在章节\ref{sec:exchange}中对有交易所的有风险做市行为作进一步探讨。
+当然交易所也可以只对冲其中一笔订单，但是这种对冲方法不是无风险对冲，因此不在我们考虑范围内。因此，如果交易所要通过无风险套利窃取交易环路的利润，那么这个环路中必然包含子环路。因此我们规定{\bfseries 合法的闭环必须保证其订单子集无法组成更小的可交易环路}。
+该要求可以通过以太坊智能合约简单有效地得到验证。当然交易所也可以只对冲其中一笔订单，但是这种对冲方法风险更大，我们会在章节\ref{sec:exchange}中对有交易所的有风险做市行为作进一步探讨。
 
 \subsection{市场深度\label{sec:marketdepth}}
 
