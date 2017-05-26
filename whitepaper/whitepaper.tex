@@ -36,6 +36,9 @@
 \newtheorem{theorem}{定理}[section]
 \newtheorem{lemma}{Lemma}
 \newtheorem{proof}{证明} [section]
+\usepackage[toc,page,title,titletoc,header]{appendix} 
+\renewcommand\appendixname{目\ 录}
+\renewcommand\appendixpagename{附\ 录}
 \usetikzlibrary{shapes.geometric}%
 
 
@@ -377,6 +380,17 @@ MTX协议代币本身遵循ERC20标准，并且在MTX智能合约的基础上带
 [段落：如何激励转发订单？？？]
 
 
+
+\section{总结\label{sec:summary}}
+
+\section{鸣谢\label{sec:acknowledgement}}
+
+\newpage
+\bibliography{whitepaper}
+\bibliographystyle{acm}
+
+\newpage
+\begin{appendices}
 \section{初始代币发行（ICO）\label{sec:ico}}
 
 我们计划发行1亿 MTX代币，8千万发给众售收参与者，2千万由MTX开源项目委员会掌管，服务于众售营销，社区维护，员工增长和未来5年的发展需要。
@@ -439,12 +453,5 @@ ICO作为一种新的众筹模式，存在着各种不同的风险，参与ICO�
 
 我们保留在ICO前采用任何形式，包括但不限于 Simple Agreement for Future Tokens（SAFT）或其修改版本进行ICO的权利。
 
-\section{总结\label{sec:summary}}
-
-\section{鸣谢\label{sec:acknowledgement}}
-
-\newpage
-\bibliography{whitepaper}
-\bibliographystyle{acm}
-
+\end{appendices}
 \end{document} 
