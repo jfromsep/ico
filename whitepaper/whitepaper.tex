@@ -24,7 +24,6 @@
 \usepackage{booktabs}
 \usepackage{float}
 \usepackage{pdflscape}
-%\usepackage{draftwatermark}
 \usepackage{mathtools}
 \usepackage[usenames,dvipsnames]{xcolor}
 \usepackage{afterpage}
@@ -37,18 +36,14 @@
 \newtheorem{theorem}{定理}[section]
 \newtheorem{lemma}{Lemma}
 \newtheorem{proof}{证明} [section]
-\usepackage[toc,page,title,titletoc,header]{appendix} 
+\usepackage[toc,page,title,titletoc,header]{appendix}
 \renewcommand\appendixname{目\ 录}
 \renewcommand\appendixpagename{附\ 录}
 \usetikzlibrary{shapes.geometric}%
 
-%\SetWatermarkText{请勿传播}
-%\SetWatermarkColor[rgb]{1,0,0}
-%\SetWatermarkScale{0.2}
-
 
 \title{Multilateral Token Exchange (MTX) Protocol\\一个以太坊代币的多边交易协议\\（草稿 v0.1）}
-\author{ 
+\author{
     dong77@gmail.com\\
 %    \and
     fdwanghui@gmail.com    % lihaomin@zhongan.io
@@ -88,7 +83,7 @@
 
 区块链对各个行业都将有着深远的影响，尤其是金融领域。我们相信基于区块链的新金融会有一个明显趋势，即资产代币化（Tokenization）：一方面链下资产的使用权，所有权，分红权等相关权益产通过抵押会被发行到区块链上，另一方面区块链上资产也会进行跨链发行。资产代币化的重要目标之一就是低成本，全球化，全天候的高流动性，而流动性则主要通过交易机制和交易所得以实现。
 
-在现阶段，提供主要流动性的交易所都有非常类似的模式：交易所要求用户将法币或者代币充值到交易所的银行或区块链账户中，然后交易所在自己中心服务器的虚拟账户系统中为用户进行IOU记账。用户实际交易的是这些IOU。为了将IOU兑换成法币或区块链代币，用户需要向交易所提出提现请求，提现成功后，才算真正交易完成。在这个过程中，交易所替用户安全保管资产的能力是用户最大的风险；同时用户还需担心交易所运营者的商业道德问题，比如挪用资金造成资不抵债等。2014年2月当时世界最大规模的比特币交易所运营商Mt.Gox的85万个比特币被盗一空，公司向日本东京地方法院申请破产保护。该公司的用户至今仍在等待其返还尚未被盗的少量比特币。随着调查的不断进行Mt.Gox被曝出所谓的比特币被盗其实是监守自盗。85万个“被偷窃”的比特币中，实际上因外部盗窃失踪的仅为7000个。2016年8月最大的美元比特币交易平台香港的Bitfinex由于网站出现安全漏洞，导致用户持有的比特币被盗，被盗的比特币共119756枚，总价值约为6500万美元。随后该公司决定由所有用户共同分担损失以避免其破产。交易所缺失的资产保管能力和监守自盗的败坏的商业道德，一方面反映出比特币在各个国家监管政策的缺失与漏洞，另一方面也证实中心化交易所模式的固有风险。
+在现阶段，提供主要流动性的交易所都有非常类似的模式：交易所要求用户将法币或者代币充值到交易所的银行或区块链账户中，然后交易所在自己中心服务器的虚拟账户系统中为用户进行IOU记账。用户实际交易的是这些IOU。为了将IOU兑换成法币或区块链代币，用户需要向交易所提出提现请求，提现成功后，才算真正交易完成。在这个过程中，交易所替用户安全保管资产的能力是用户最大的风险；同时用户还需担心交易所运营者的商业道德问题，比如挪用资金造成资不抵债等。2014年2月当时世界最大规模的比特币交易所运营商Mt.Gox的85万个比特币被盗一空，公司向日本东京地方法院申请破产保护。该公司的用户至今仍在等待其返还尚未被盗的少量比特币。随着调查的不断进行Mt.Gox 被曝出所谓的比特币被盗其实是监守自盗。85万个“被偷窃”的比特币中，实际上因外部盗窃失踪的仅为7000个。2016年8月最大的美元比特币交易平台香港的Bitfinex由于网站出现安全漏洞，导致用户持有的比特币被盗，被盗的比特币共119756枚，总价值约为6500万美元。随后该公司决定由所有用户共同分担损失以避免其破产。交易所缺失的资产保管能力和监守自盗的败坏的商业道德，一方面反映出比特币在各个国家监管政策的缺失与漏洞，另一方面也证实中心化交易所模式的固有风险。
 
 基于区块链的去中心化交易机制就是为了彻底解决上述问题。去中心化交易的核心优势之一是避免任何资产被托管，因此资产就不存在被盗的可能性，这会极大降低用户对交易所的信任成本；这种交易机制的另一个优势是没有地缘和时间限制，以及极高的透明性和可追溯性。这些特点会促使交易整体具有更大的流动性和更小的买卖价差。
 
@@ -108,7 +103,7 @@ Bancor协议引入了一种基于数学模型的方案去试图解决经济学�
 
 0x \cite{warren20170x} 是一个可以在以太坊区块链上进行 ERC20 代币对等交易的开放式协议。该协议旨在成为通用开放标准，作为可与其他协议组合的基本模块，用以驱动越来越复杂的区块链应用程序。由于它使用的是公开访问的智能合约系统，因此可以作为各种 dApps 的共享基础架构。而从长远来看，开放式技术标准相比封闭模式具有更大的优势，随着每个月有更多的资产在区块链上被代币化，也有更多的 dApps 需要使用这些不同的代币，开放式标准也因此变得更加重要。此外，由 dApps 耦合到其底层协议所导致的智能合约冗余也是未来区块链协议开发的主要障碍，因此在标准化之余，我们还需要一个合适的解耦方式。0x 协议试图将信息交换功能从应用层拉到协议层，推动 dApps 之间的互操作性。然而，0x协议具有以下局限性：taker必须在线匹配订单，这导致撮合实时性差，难以优化成交价格；0x协议采用的是简单的OTC方式，无法法实现复杂订单的撮合；不同交易所之间没有明确的竞争激励机制；没有考虑了矿工的利益。
 
-然后上述努力由于种种限制，到目前为止依然没有能够撼动中心化交易所的地位。我们受到支付通道和0x协议的启发，提出一种可行的，基于区块链技术的交易撮合标准。
+然后上述努力由于种种限制，到目前为止依然没有能够撼动中心化交易所的地位。我们受到支付通道和0x 协议的启发，提出一种可行的，基于区块链技术的交易撮合标准。
 
 
 \section{协议设计\label{sec:protocol}}
@@ -133,9 +128,9 @@ Bancor协议引入了一种基于数学模型的方案去试图解决经济学�
 	\item 交易所监听新的区块和链下新的交易数据，并根据这些数据更新订单表，然后不断进行新的撮合。
 \end{enumerate}
 
-在传统交易所模型中，被撮合的两方中先下单的为Maker，后下单的为Taker。因为Maker创造流动性而Taker销毁流动性，所以在计算成交价时候会更偏向于Maker的价格，甚至直接采用Maker的价格作为成交价。与之相比，MTX采用的是Over-The-Counter（OTC）模型。主要的原因是在去中心化环境中，很难严格界定哪个单是真正意义上较早的单。因此MTX的撮合设计不考虑时间因素，只考虑兑换率（在本文中我们偶尔也用价格一词与兑换率交替使用）。
+在传统交易所模型中，被撮合的两方中先下单的为Maker，后下单的为Taker。因为Maker 创造流动性而Taker销毁流动性，所以在计算成交价时候会更偏向于Maker 的价格，甚至直接采用Maker的价格作为成交价。与之相比，MTX采用的是Over-The-Counter（OTC）模型。主要的原因是在去中心化环境中，很难严格界定哪个单是真正意义上较早的单。因此MTX的撮合设计不考虑时间因素，只考虑兑换率（在本文中我们偶尔也用价格一词与兑换率交替使用）。
 
-MTX协议的另一个显著特点是消除了传统交易所中\texttt{交易对（Trading Pair）}的概念。一个从$A$到$B$的订单不一定要一个反向的从$B$到$A$订单才能撮合，只要有一个交易环路被发现，就可以撮合。也可以说传统交易所的交易对是多边交易环路的一个最简特例。
+MTX协议的另一个显著特点是消除了传统交易所中\texttt{交易对（Trading Pair）}的概念。一个从$A$ 到$B$的订单不一定要一个反向的从$B$到$A$订单才能撮合，只要有一个交易环路被发现，就可以撮合。也可以说传统交易所的交易对是多边交易环路的一个最简特例。
 
 接下来我们介绍可以撮合成交的交易环路相关的概念，包括\texttt{交易链}，交易链的可归约性，成交价，成交量，和交易所收益模型。
 
@@ -148,10 +143,9 @@ MTX协议的另一个显著特点是消除了传统交易所中\texttt{交易对
 &O_{i\rightarrow j}\text{：}\text{一个卖出代币为$C_{i}$，买入代币为$C_{j}$的订单。}\\
 &s_{i\rightarrow j}\text{：}\text{表示上述订单的当前卖出代币$C_{i}$的数量。}\\
 &b_{i\rightarrow j}\text{：}\text{表示上述订单的当前买入代币$C_{j}$的数量。}\\
-&r_{i\rightarrow j}\text{：}\text{为订单$O_{C_{i}\rightarrow C_{j}}$的兑换率，即$s_{i\rightarrow j}/b_{i\rightarrow j}$}。
+&r_{i\rightarrow j}\text{：}\text{为订单$O_{i\rightarrow j}$的兑换率，即$s_{i\rightarrow j}/b_{i\rightarrow j}$。}
 %&t^{a}_{i\rightarrow j}\text{：}\text{表示上述订单中MTX代币的数量，用于撮合费用。}\\
 %&\beta^{a}_{i\rightarrow j}\text{：}\text{表示上述订单中的成交价分润比例。}\\
-。
 \end{split}
 \]
 
@@ -173,7 +167,7 @@ s_{i\rightarrow j\rightarrow k}=min(b_{i\rightarrow j},s_{j\rightarrow k}) \cdot
 \end{equation}
 
 \begin{equation}
-b_{i\rightarrow j\rightarrow k}=min(b_{i\rightarrow j},s_{j\rightarrow k}) \div r_{j\rightarrow k}
+b_{i\rightarrow j\rightarrow k}=min(b_{i\rightarrow j},s_{j\rightarrow k}) / r_{j\rightarrow k}
 \end{equation}
 
 \begin{equation}
@@ -186,14 +180,14 @@ r_{i\rightarrow j\rightarrow k}= r_{i\rightarrow j}\cdot r_{j\rightarrow k}
 \[ s_{0\rightarrow ...\rightarrow n} =
   \begin{cases}
     s_{0\rightarrow 1}      & \quad \text{如 } n \text{ == 1}\\
-    min(b_{0\rightarrow ...\rightarrow n-1},s_{n-1\rightarrow n}) \cdot r_{0\rightarrow ...\rightarrow n-1}  & \quad \text{如} n \text{ > 1}\\
+    min(b_{0\rightarrow ...\rightarrow n-1},s_{n-1\rightarrow n}) \cdot r_{0\rightarrow ...\rightarrow n-1}  & \quad \text{如} n \text{ $>$ 1}\\
   \end{cases}
 \]
 
 \[ b_{0\rightarrow ...\rightarrow n} =
   \begin{cases}
     b_{0\rightarrow 1}      & \quad \text{如 } n \text{ == 1}\\
-    min(b_{0\rightarrow ...\rightarrow n-1},s_{n-1\rightarrow n}) \div r_{n-1\rightarrow n}  & \quad \text{如} n \text{ > 1}\\
+    min(b_{0\rightarrow ...\rightarrow n-1},s_{n-1\rightarrow n}) / r_{n-1\rightarrow n}  & \quad \text{如} n \text{ $>$ 1}\\
   \end{cases}
 \]
 
@@ -206,13 +200,13 @@ r_{i\rightarrow j\rightarrow k}= r_{i\rightarrow j}\cdot r_{j\rightarrow k}
 
 \subsection{环路撮合}
 
-传统撮合系统是在两个币种间，即一个交易对的买卖两个方向间完成撮合；而MTX协议将撮合的概念扩展到多币种，通过\texttt{交易环路}来完成多个币种之间交易的撮合。下面介绍一下交易环路的概念。
+传统撮合系统是在两个币种间，即一个交易对的买卖两个方向间完成撮合；而MTX 协议将撮合的概念扩展到多币种，通过\texttt{交易环路}来完成多个币种之间交易的撮合。下面介绍一下交易环路的概念。
 
 \begin{definition}[交易环路]
-假定有$n$个币种$C_{0}$、$C_{1}$、...、$C_{n-1}$，和$n$个订单：$O_{0\rightarrow 1}$，$O_{1 \rightarrow 2}$，...，$O_{n-2 \rightarrow n-1}$，$O_{n-1 \rightarrow 0}$,
+如果有$n$个币种$C_{0}$、$C_{1}$、$\cdots$、$C_{n-1}$，和$n$个订单：$O_{0\rightarrow 1}$， $\cdots$， $O_{i\rightarrow i\oplus 1}$， $\cdots$， $O_{n-1 \rightarrow 0}$，其中，$i\oplus 1 \equiv i+1 \mod n$。
 那么这些订单可以组成跨n个币种的交易环路：
 
-$O_{0\rightarrow 1} \rightarrow O_{1\rightarrow 2} \rightarrow ... \rightarrow O_{n-2\rightarrow n-1} \rightarrow O_{n-1\rightarrow 0}$ ，其中$n$为环路的长度。
+$O_{0\rightarrow 1} \rightarrow \cdots \rightarrow O_{i\rightarrow i\oplus 1} \rightarrow \cdots \rightarrow O_{n-1\rightarrow 0}$ ，其中$n$为环路的长度。
 \end{definition}
 
 当这些订单的价格\textbf{满足一定条件时}，我们可以对整个交易环路进行撮合，这种交易环路称为\textbf{可交易环路}。下面我们对交易环路中的成交价格和成交量进行讨论。
@@ -237,7 +231,7 @@ r_{0\rightarrow 1} \cdot (1-\gamma)\cdot r_{1\rightarrow 2} \cdot (1-\gamma) \cd
 \gamma = 1- \frac{1}{\sqrt[n]{\prod_{i=0}^{n-1} r^i}} \text{，其中} r^i \text{表示第}i\text{个订单的兑换率。}
 \end{equation*}
 
-显然，只有在兑换率折扣$\gamma \ge 0$时，交易环路才可以真正成交；且第$i$个订单$O^i$的实际兑换率$\hat{r^i} = r^i \cdot (1-\gamma)$，且有$\hat{r^i}\le r^i$。
+显然，只有在兑换率折扣$\gamma \ge 0$时，交易环路才可以真正成交；且第$i$ 个订单$O^i$的实际兑换率$\hat{r^i} = r^i \cdot (1-\gamma)$，且有$\hat{r^i}\le r^i$。
 
 %在章节\ref{sec:fee}中，我们还会详细介绍交易所通过MTX代币抵押的原因和细节，最终的结果是每个交易都被迫给自己的撮合的实际兑换率打个折扣，即\texttt{交易所折扣}。假交易所$X$的交易所折扣为$\mu$，那么由该交易所撮合是，最后的实际成交兑换率为：$\hat{r^i} = r^i \cdot (1-\gamma) \cdot (1-\mu)$
 
@@ -246,14 +240,15 @@ r_{0\rightarrow 1} \cdot (1-\gamma)\cdot r_{1\rightarrow 2} \cdot (1-\gamma) \cd
 
 当一个交易环路撮合完成后，至少有一个订单是被完全成交的。这点很容易得到证明：我们可以相反的结论，即全部订单都没有完全成交。由于章节\ref{sec:consistrate}中要求兑换率在订单新状态（尾单）中保持不变，意味着撮合后新的环路依然满足成交条件。这就意味着之前的撮合是没用进行完的。因此可以断言：一次完整的撮合应该会将至少一个订单完全吃掉。我们正这个（些）被完全吃掉的订单为交易环路的\texttt{最小订单}。
 
-找到任何一个最小订单，既计算环路中所有订单的成交量。假设第$i$个订单是最小订单，那么每笔订单的卖出代币成交量$\hat{s}$和买入代币$\hat{b}$可以以此如下计算得出：
+找到任何一个最小订单，既计算环路中所有订单的成交量。假设第$i$个订单是最小订单，那么每笔订单的卖出代币成交量$\hat{s}$和买入代币成交量$\hat{b}$可以以此如下计算得出：
 
 \[
 \begin{split}
-&\hat{s}^{i}=\overline{s}_i\text{，} \hat{b}^{i}=\hat{s}^{i}/\hat{r}^i \text{，其中}\overline{s}_i\text{为订单的卖出代币余额。}\\
-&\hat{s}^{i+1\mod n}=\hat{b}^i\text{，} \hat{b}^{i+1\mod n}=\hat{s}^{i+1\mod n}/\hat{r}^{i+1\mod n}，\\
-&\hat{s}^{i+2\mod n}=\hat{b}^{i+1\mod n}\text{，} \hat{b}^{i+2\mod n}=\hat{s}^{i+2\mod n}/\hat{r}^{i+2\mod n}，\\
-& ...。
+&\hat{s}^{i}=\overline{s}_i\text{，} \hat{b}^{i}=\hat{s}^{i}/\hat{r}^i \text{，其中}\overline{s}_i\text{为订单的卖出代币余额;}\\
+&\hat{s}^{i+1\mod n}=\hat{b}^i\text{，} \hat{b}^{i+1\mod n}=\hat{s}^{i+1\mod n}/\hat{r}^{i+1\mod n}\text{;}\\
+&\hat{s}^{i+2\mod n}=\hat{b}^{i+1\mod n}\text{，} \hat{b}^{i+2\mod n}=\hat{s}^{i+2\mod n}/\hat{r}^{i+2\mod n}\text{;}\\
+& ...
+%\text{。}
 \end{split}
 \]
 
@@ -300,6 +295,42 @@ F =(1-\lambda)\cdot (1-\eta) \cdot  \sum^{n-1}_{i=0} (b^i \cdot r^i \cdot \gamma
 
 两种不同的费用模型能够满足不同订单的诉求：对于没有MTX代币的账户，可以设置合适的分润比例；对于有MTX代币的账户，可以选择支付较多的代币费用，并将分润比例设为一个较小值。交易所有可能对每笔订单的代币费用值有个最小额度限制，MTX协议并不对此作出明确要求。交易所可以在自己网站上对相关标准做说明，并引导用户设定合适的订单参数值。
 
+\subsubsection{交易所分润折扣}
+交易所需要强制给用户一定的分润折扣，折扣大小决定于用户抵押代币MTX的数量。交易所在注册时需要抵押一部代币MTX，抵押数量排名越靠后，折扣越高。假定排名为$n$的折扣为
+$$\lambda_{n} = 0.5 - \frac{1}{2\cdot (1+\ln n)}\text{。}$$
+很容易证明$\lambda \in [0,0.5)$，具体返利比例如下表所示：
+\begin{center}
+\begin{tablehere}%开始一个表格environment，表格的位置是h,here。
+\centering
+\begin{tabular}{p{3.5cm}|p{3cm}} %设置了每一列的宽度，强制转换。
+\hline
+抵押MTX排名 & 分润折扣$\lambda$ \\ %用&来分隔单元格的内容 \\表示进入下一行
+\hline %画一个横线，下面的就都是一样了，这里一共有4 行内容
+1 & 0\%\\
+\hline
+2 & $20.47\%$\\
+\hline
+10 & $34.86\%$\\
+\hline
+100 &$41.08\%$\\
+\hline
+\end{tabular}
+%\caption{抵押MTX排名与分润折扣} %显示表格的标题
+\end{tablehere}
+\end{center}
+
+
+如下图所示，折扣的下降并非线性的，如$\lambda_{2} - \lambda_{1} \gg \lambda_{100} - \lambda_{10}$。
+
+\begin{center}
+\begin{figurehere}
+\includegraphics[height=8cm]{images/exchange-discount.png}
+\caption{MTX代币抵押与分润折扣}
+\label{fig:mtxprotocol}
+\end{figurehere}
+\end{center}
+
+
 \subsection{防作弊和防攻击}
 
 \subsubsection{交易所无风险套利}
@@ -329,7 +360,7 @@ MTX协议允许交易所选择性地为特定订单做撮合。交易所有权�
 
 \subsection{市场深度\label{sec:marketdepth}}
 
-交易所并不一定需要提供市场深度数据，或者在整个生态立，可能会有单独的组织和机构汇集全网的未成交订单或者交易的尾单信息，汇总成独立的市场深度数据。市场深度数据可以根据章节\ref{sec:reducability}中的订单的规约方法，计算出任何两个ERC20代币之间的买单卖单数据。
+交易所并不一定需要提供市场深度数据，或者在整个生态立，可能会有单独的组织和机构汇集全网的未成交订单或者交易的尾单信息，汇总成独立的市场深度数据。市场深度数据可以根据章节\ref{sec:reducability}中的订单的规约方法，计算出任何两个ERC20 代币之间的买单卖单数据。
 
 \subsection{数据格式\label{sec:dataformat}}
 
@@ -352,9 +383,9 @@ message Order {
 }	
 \end{verbatim}
 
-订单中虽然没有明确指定价格，但我们可以通过计算$outAmount \div inAmount$来得到一个订单兑换率$r$。该兑换率隐含地要求所有实际撮合成交的兑换率不得大于$r$。一个好的交易所UI应该允许用户输入$outAmount$，$inAmount$，和传统意义的买入价或卖出价这三个数据的任意两个来计算缺失的$outAmount$或$outAmount$值。
+订单中虽然没有明确指定价格，但我们可以通过计算$outAmount \div inAmount$ 来得到一个订单兑换率$r$。该兑换率隐含地要求所有实际撮合成交的兑换率不得大于$r$。 一个好的交易所UI应该允许用户输入$outAmount$，$inAmount$，和传统意义的买入价或卖出价这三个数据的任意两个来计算缺失的$outAmount$或$outAmount$值。
 
-订单实际上可以有两种不同的\texttt{完全成交}定义：一种定义是只有卖出代币达到了$outAmount$就算完全成交；另一种定义在之前的基础上允许买入代币累计金额达到$inAmount$也算完全成交。我们可以在订单中引入一个参数告诉交易所和撮合智能合约选择哪种完全成交定义。在第一版本的实现中，我们先支持第一种完全成交定义。
+订单实际上可以有两种不同的\texttt{完全成交}定义：一种定义是只有卖出代币达到了$outAmount$ 就算完全成交；另一种定义在之前的基础上允许买入代币累计金额达到$inAmount$也算完全成交。我们可以在订单中引入一个参数告诉交易所和撮合智能合约选择哪种完全成交定义。在第一版本的实现中，我们先支持第一种完全成交定义。
 
 
 交易所可以通过下面的数据结构构件一个交易环路：
@@ -371,11 +402,11 @@ message Match {
 
 \subsection{订单状态\label{sec:orderstate}}
 
-订单发起者对订单签字广播后无论该订单是否成交，都不会也无法对该订单进行修改，因此撮合智能合约一旦对某个订单进行撮合，就需要就订单的新状态在区块链上更新。对部分或者完全成交的订单，会计算更新$inAmount$和$outAmount$两个值，并且保障订单新状态价格和原始订单的价格一致。如果$inAmount$或$outAmount$为0，则表示该订单已经完全成交。如果用户取消订单，需要发起一个特殊的交易，将$inAmount$和$outAmount$更改为0即可。过期的订单不会触发区块链上的数据更新 --- 可以根据最后一个块的时间戳来判断任何一个订单是否过期 --- 因此我们期待多数的订单会因为过期或者完全成交而变成失效。
+订单发起者对订单签字广播后无论该订单是否成交，都不会也无法对该订单进行修改，因此撮合智能合约一旦对某个订单进行撮合，就需要就订单的新状态在区块链上更新。对部分或者完全成交的订单，会计算更新$inAmount$和$outAmount$ 两个值，并且保障订单新状态价格和原始订单的价格一致。如果$inAmount$或$outAmount$为0，则表示该订单已经完全成交。如果用户取消订单，需要发起一个特殊的交易，将$inAmount$和$outAmount$更改为0即可。过期的订单不会触发区块链上的数据更新 --- 可以根据最后一个块的时间戳来判断任何一个订单是否过期 --- 因此我们期待多数的订单会因为过期或者完全成交而变成失效。
 
 交易所需要采用同样的甚至是更复杂的逻辑在区块链外追踪订单状态，尤其是当一家交易监听到到竞争对手在对同一个订单做不同的撮合的时候。我们在章节\ref{sec:exchange}中做进一步探讨。
 
-一个可交易的订单还需要其账户中有足够多的卖出代币余额$balance$，虽然这个余额不要求达到订单中$outAmount$的数量。实际上交易所在对订单状态计算的时候，会取$max(balance, outAmount)$作为实际的可成交金额。也就是说，交易所不仅仅要监听订单被（其它交易所）撮合的结果，还需要监听订单账户的余额变动情况。看起来这种对区块链数据的监听和对订单状态的更新有些复杂，但这些反而极大简化区块链上合约的逻辑，这种思路和比特币闪电网络，以太坊的雷霆网络的思路是一致的。
+一个可交易的订单还需要其账户中有足够多的卖出代币余额$balance$，虽然这个余额不要求达到订单中$outAmount$的数量。实际上交易所在对订单状态计算的时候，会取$max(balance, outAmount)$ 作为实际的可成交金额。也就是说，交易所不仅仅要监听订单被（其它交易所）撮合的结果，还需要监听订单账户的余额变动情况。看起来这种对区块链数据的监听和对订单状态的更新有些复杂，但这些反而极大简化区块链上合约的逻辑，这种思路和比特币闪电网络，以太坊的雷霆网络的思路是一致的。
 
 
 \subsection{智能合约\label{sec:contracts}}
@@ -389,7 +420,7 @@ MTX协议协议可能包含多个智能合约，包括但不限于：
 	\item \textbf{统计合约}  负责以代币和交易所为对象，计算任何两个币种之间的成交量，成交价，以及不同交易所的贡献度等指标，以及这些指标的某些滑动平均值。这些指标是订单发起者授权撮合的重要参考依据，同时也可以作为某些预测市场的输入，并且为以后可能的协议拓展对条件单进行一定的支持。为了防止交易所经常变动身份，抛弃掉对自己不利的统计数据，MTX协议要求交易所注册时锁定一定额度MTX代币作为信用抵押。我们会在章节\ref{sec:protocoltoken}中做进一步说明。
 \end{itemize}
 
-这些合约的具体实现需根据以太坊智能合约语言的限制做适当修改，不排除将上述合约进一步拆解或合并的可能。同时值得指出：MTX协议中的智能合约是完全开放的，这意味着它们可以被任何的dApp直接或者间接调用。因此整个协议即使一个完善的整体，又是个开放的，单独可用的组件的集合。
+这些合约的具体实现需根据以太坊智能合约语言的限制做适当修改，不排除将上述合约进一步拆解或合并的可能。同时值得指出：MTX协议中的智能合约是完全开放的，这意味着它们可以被任何的dApp 直接或者间接调用。因此整个协议即使一个完善的整体，又是个开放的，单独可用的组件的集合。
 
 
 \subsection{支持ENS\label{sec:registration}}
@@ -415,7 +446,7 @@ $MTX$在生态中发挥下列作用：
 
 \subsection{代币的原生流动性}
 
-MTX协议代币本身遵循ERC20标准，并且在MTX智能合约的基础上带有原生的流动性 --- 这意味着你不必去传统的交易所购买和出售MTX，而是可以通过本文论述的方式，利用MTX协议本身的去中心化撮合机制，使用任何以太坊上ERC20货币购得MTX货币（订单中的买入货币设定为MTX，并将$fee$设为0）。这得益于协议灵活的收费模式。
+MTX协议代币本身遵循ERC20标准，并且在MTX智能合约的基础上带有原生的流动性 --- 这意味着你不必去传统的交易所购买和出售MTX，而是可以通过本文论述的方式，利用MTX协议本身的去中心化撮合机制，使用任何以太坊上ERC20货币购得MTX 货币（订单中的买入货币设定为MTX，并将$fee$设为0）。这得益于协议灵活的收费模式。
 
 \section{交易所\label{sec:exchange}}
 
@@ -485,7 +516,7 @@ TBD
 
 \subsection{ETH/ETC双链发行\label{sec:chains}}
 
-虽然我们只支持通过ETH众筹，但我们也意识到ETC作为智能合约平台的潜力。因此我们会同时在Ethereum（ETH）和Ethereum Classic（ETC）两条链上同时为众筹的地址发行MTX代币。我们不接受ETC众筹的原因主要是因为无法简单有效对两种资产做兑换率计算，进而可能会产生因代币分配不公带来的分歧。
+虽然我们只支持通过ETH众筹，但我们也意识到ETC作为智能合约平台的潜力。因此我们会同时在Ethereum （ETH）和Ethereum Classic（ETC）两条链上同时为众筹的地址发行MTX代币。我们不接受ETC 众筹的原因主要是因为无法简单有效对两种资产做兑换率计算，进而可能会产生因代币分配不公带来的分歧。
 
 
 \subsection{风险提示\label{sec:risks}}
@@ -494,7 +525,7 @@ ICO作为一种新的众筹模式，存在着各种不同的风险，参与ICO�
 \begin{itemize}
 	\item MTX代币不赋予控制权 - 控制MTX代币不能赋予其控制人对MTX平台或任何关联企业的所有权或股权。MTX代币不赋予任何参与涉及MTX平台的决策的权利。
 	\item 不保证营销带来的收益或利润 - 此文中所有的收益和利润举例仅为展示目的，或代表行业平均值，并不构成对营销结果的保证。
-	\item 监管不确定性 - 区块链相关的科技已经成为全世界不同监管机构的监管和审查目标。MTX代币网络可能会受到一个或多个监管调查或行为的冲击，包括但不限于对MTX这样的电子代币的使用或持有的限制，这可能损害或限制MTX代币未来的功能和回购操作。
+	\item 监管不确定性 - 区块链相关的科技已经成为全世界不同监管机构的监管和审查目标。MTX 代币网络可能会受到一个或多个监管调查或行为的冲击，包括但不限于对MTX这样的电子代币的使用或持有的限制，这可能损害或限制MTX代币未来的功能和回购操作。
 	\item MTX代币不是投资品 - MTX代币不代表任何正式或有法律约束力的投资品。鉴于不可预知的情况，本白皮书列出的目标可能发生变化。虽然我们会尽力实现本白皮书的所有目标，所有购买MTX代币的个人和团体因此将自担风险。
 	\item 丢失风险 - 来自众售的资金未获得保险。如果发生丢失事件，或价值损失，将没有公共或私营保险人会提供给购买者保障。
 	\item 与MTX开发人员雇主公司无关 - MTX代币的众售资金并不由任何与相关开发人员的雇主相关或所有。MTX开源项目委员会独立实体，有着完全独立的所有权结构。
@@ -503,7 +534,7 @@ ICO作为一种新的众筹模式，存在着各种不同的风险，参与ICO�
 \end{itemize}
 
 
-我们保留在ICO前采用任何形式，包括但不限于 Simple Agreement for Future Tokens（SAFT）或其修改版本进行ICO的权利。
+我们保留在ICO前采用任何形式，包括但不限于 Simple Agreement for Future Tokens （SAFT）或其修改版本进行ICO的权利。
 
 \end{appendices}
-\end{document} 
+\end{document}
