@@ -40,11 +40,23 @@
 \renewcommand\appendixname{目\ 录}
 \renewcommand\appendixpagename{附\ 录}
 \usetikzlibrary{shapes.geometric}%
+\usepackage{color}
+\usepackage[pages=some,placement=top]{background}
+
+\backgroundsetup{
+scale=1,
+color=black,
+opacity=1,
+angle=0,
+contents={%
+  \includegraphics[width=\paperwidth,height=\paperheight]{images/background.png}
+  }%
+}
 
 
 \title{Multilateral Token Exchange (MTX) Protocol\\一个以太坊代币的多边交易协议\\（草稿 v0.1）}
 \author{
-    dong77@gmail.com\\
+    dong77@gmail.com\\.
 %    \and
     fdwanghui@gmail.com    % lihaomin@zhongan.io
 }
@@ -62,6 +74,7 @@
   {\def\@captype{figure}}
   {}
 \makeatother
+
 
 
 \begin{document}
@@ -286,7 +299,7 @@ F = \sum^{n-1}_{i=0} b^i \cdot r^i \cdot \gamma \cdot \Theta
 
 为了鼓励MTX代币的使用，如果订单中没有指定代币费用$m^i$，或$m^i==0$，那么该笔订单的分润比例实际被认为是100\%，而不管订单中相应参数的值是多少。如果一个交易环路中的所有订单都没有设置代币费用，那么环路中所有成本节约归交易所所有。
 
-在下一章节，我们引入了一个激励交易所竞争的代币抵押机制，智能合约根据每个交易所代币抵押排名，为每个交易所计算一个分润折扣，$\lambda$，该折扣会计入交易所的费用收取计算上；同时，交易所也可以指定为某个交易环路做进一步的费用优惠折扣，$\eta$。因此，交易所对于一个交易环路的整体费用为：
+在下一章节，我们还引入了一个激励交易所竞争的代币抵押机制，智能合约根据每个交易所代币抵押排名，为每个交易所计算一个分润折扣，$\lambda$，该折扣会计入交易所的费用收取计算上；同时，交易所也可以指定为某个交易环路做进一步的费用优惠折扣，$\eta$。因此，交易所对于一个交易环路的整体费用为：
 
 \begin{equation*}
 F =(1-\lambda)\cdot (1-\eta) \cdot  \sum^{n-1}_{i=0} (b^i \cdot r^i \cdot \gamma \cdot \Theta + b^i \cdot m^i  \div \overline{b^i})
@@ -297,10 +310,10 @@ F =(1-\lambda)\cdot (1-\eta) \cdot  \sum^{n-1}_{i=0} (b^i \cdot r^i \cdot \gamma
 
 \subsubsection{交易所分润折扣}
 交易所需要强制给用户一定的分润折扣，折扣大小决定于用户抵押代币MTX的数量。交易所在注册时需要抵押一部代币MTX，抵押数量排名越靠后，折扣越高。假定排名为$n$的折扣为
-$$\lambda_{n} = 0.5 - \frac{1}{2\cdot (1+\ln n)}\text{。}$$
-很容易证明$\lambda \in [0,0.5)$，具体返利比例如下表所示：
-\begin{center}
-\begin{tablehere}%开始一个表格environment，表格的位置是h,here。
+$$\lambda_{n} = 0.05*(\ln (n+e-1) - 1)\text{。}$$
+具体返利比例如下表所示：
+\begin{table}
+\caption{抵押MTX排名与分润折扣} %显示表格的标题
 \centering
 \begin{tabular}{p{3.5cm}|p{3cm}} %设置了每一列的宽度，强制转换。
 \hline
@@ -308,19 +321,26 @@ $$\lambda_{n} = 0.5 - \frac{1}{2\cdot (1+\ln n)}\text{。}$$
 \hline %画一个横线，下面的就都是一样了，这里一共有4 行内容
 1 & 0\%\\
 \hline
-2 & $20.47\%$\\
+2 & $1.57\%$\\
 \hline
-10 & $34.86\%$\\
+10 & $7.31\%$\\
 \hline
-100 &$41.08\%$\\
+20 & $10.39\%$\\
+\hline
+99 &$18.06\%$\\
+\hline
+100 &$18.11\%$\\
+\hline
+1000 &$29.55\%$\\
+\hline
+1001 &$30.00\%*$\\
 \hline
 \end{tabular}
-%\caption{抵押MTX排名与分润折扣} %显示表格的标题
-\end{tablehere}
-\end{center}
+\end{table}
 
+对于排名1001及以后的交易所，或未进行抵押的交易所，统一实施30\%强制分润折扣。
 
-如下图所示，折扣的下降并非线性的，如$\lambda_{2} - \lambda_{1} \gg \lambda_{100} - \lambda_{10}$。
+如下图所示，折扣的下降并非线性的，如$\lambda_{2} - \lambda_{1} \gg \lambda_{100} - \lambda_{99}$。
 
 \begin{center}
 \begin{figurehere}
@@ -329,7 +349,6 @@ $$\lambda_{n} = 0.5 - \frac{1}{2\cdot (1+\ln n)}\text{。}$$
 \label{fig:mtxprotocol}
 \end{figurehere}
 \end{center}
-
 
 \subsection{防作弊和防攻击}
 
@@ -464,7 +483,7 @@ MTX协议代币本身遵循ERC20标准，并且在MTX智能合约的基础上带
 
 我们会继续深入研究MTX协议的细节，晚上概念证明的开发；同时我们将筹建非营利性的MTX基金会，通过基金会在以太坊社区进行众筹和代币发行。敬请关注。
 
-\section{鸣谢\label{sec:acknowledgement}}
+\section{感谢\label{sec:acknowledgement}}
 
 TBD
 
