@@ -41,18 +41,8 @@
 \renewcommand\appendixpagename{附\ 录}
 \usetikzlibrary{shapes.geometric}%
 \usepackage{color}
-\usepackage[pages=some,placement=top]{background}
-
-\backgroundsetup{
-scale=1,
-color=black,
-opacity=1,
-angle=0,
-contents={%
-  \includegraphics[width=\paperwidth,height=\paperheight]{images/background.png}
-  }%
-}
-
+%\usepackage[pages=some,placement=top]{background}
+\usepackage{eso-pic}
 
 \title{Multilateral Token Exchange (MTX) Protocol\\一个以太坊代币的多边交易协议\\（草稿 v0.2）}
 \author{
@@ -75,9 +65,19 @@ contents={%
   {}
 \makeatother
 
-
+\newcommand\BackgroundPic{%
+\put(0,0){%
+\parbox[b][\paperheight]{\paperwidth}{%
+\vfill
+\centering
+\includegraphics[width=\paperwidth,height=\paperheight,%
+%keepaspectratio]{images/background.jpg}%
+]{images/background.jpg}%
+\vfill
+}}}
 
 \begin{document}
+\AddToShipoutPicture{\BackgroundPic}
 \maketitle
 
 \begin{abstract}
