@@ -47,7 +47,7 @@
 %\usepackage[pages=some,placement=top]{background}
 \usepackage{eso-pic}
 
-\title{Multilateral Token Trade Protocol (MTTP)\\一个以太坊代币的多边交易协议\\（草稿 v0.2）}
+\title{Multilateral Token Trade Protocol (MTTP)\\一个以太坊代币的多边交易协议\\（草稿 v0.3）}
 \author{
     dong77@gmail.com\\
 %    \and
@@ -126,9 +126,9 @@ Bancor协议引入了一种基于数学模型的方案去试图解决经济学�
 
 \begin{center}
 \begin{figurehere}
-\includegraphics[height=10cm]{images/mtx-protocol.png}
+\includegraphics[height=10cm]{images/protocol.png}
 \caption{MTTP协议：图中示例一个三边交易的撮合}
-\label{fig:mttpprotocol}
+\label{fig:MTTPprotocol}
 \end{figurehere}
 \end{center}
 
@@ -184,8 +184,6 @@ maker和taker地位平等& 否 & 是\\
   \end{tabular}
 \caption{传统交易所\ V.S.\ MTTP协议} %显示表格的标题
 \end{table}
-
-
 
 
 
@@ -289,7 +287,7 @@ r_{0\rightarrow 1} \cdot (1-\gamma)\cdot r_{1\rightarrow 2} \cdot (1-\gamma) \cd
 
 显然，只有在兑换率折扣$\gamma \ge 0$时，交易环路才可以真正成交；且第$i$ 个订单$O^i$的实际兑换率$\hat{r^i} = r^i \cdot (1-\gamma)$，且有$\hat{r^i}\le r^i$。
 
-%在章节\ref{sec:fee}中，我们还会详细介绍交易所通过MTC代币抵押的原因和细节，最终的结果是每个交易都被迫给自己的撮合的实际兑换率打个折扣，即\texttt{交易所折扣}。假交易所$X$的交易所折扣为$\mu$，那么由该交易所撮合是，最后的实际成交兑换率为：$\hat{r^i} = r^i \cdot (1-\gamma) \cdot (1-\mu)$
+%在章节\ref{sec:fee}中，我们还会详细介绍交易所通过MTTP代币抵押的原因和细节，最终的结果是每个交易都被迫给自己的撮合的实际兑换率打个折扣，即\texttt{交易所折扣}。假交易所$X$的交易所折扣为$\mu$，那么由该交易所撮合是，最后的实际成交兑换率为：$\hat{r^i} = r^i \cdot (1-\gamma) \cdot (1-\mu)$
 
 
 \subsubsection{成交量\label{sec:matchquantity}}
@@ -327,6 +325,7 @@ f^i = b^i \cdot m^i  \div \overline{b^i}
 
 MTTP协议允许每个订单设定一个成本节约分享\texttt{分润比例} $\theta^i$，并将交易环路上所有订单分润比例的最小值作为该环路的分润比例$\Theta$，那么订单$O^i$ 支付给交易所的费用为：
 
+
 \begin{equation*}
 f^i = \Delta^i \cdot \Theta = b^i \cdot r^i \cdot \gamma \cdot \Theta
 \end{equation*}
@@ -342,6 +341,7 @@ F = \sum^{n-1}_{i=0} b^i \cdot r^i \cdot \gamma \cdot \Theta
 
 为了鼓励MTTP 的代币$MTC$ 的使用，如果订单中没有指定代币费用$m^i$，或$m^i=0$，那么该笔订单的分润比例实际被认为是100\%，而不管订单中相应参数的值是多少。如果一个交易环路中的所有订单都没有设置代币费用，$\Theta=100\%$，环路中所有成本节约归交易所所有。
 
+
 在下一章节，我们会引入一个激励交易所竞争的代币抵押机制，智能合约根据每个交易所代币抵押数量的排名，为每个交易所计算一个\texttt{费用强制折扣}，$\lambda$，该折扣会进一步影响交易所的费用收取；同时，交易所也可以指定为某个交易环路做进一步的费用优惠折扣，$\eta$。因此，交易所对于一个交易环路的整体费用为：
 
 \begin{equation*}
@@ -353,6 +353,7 @@ F =(1-\lambda)\cdot (1-\eta) \cdot  \sum^{n-1}_{i=0} (b^i \cdot r^i \cdot \gamma
 
 \subsubsection{交易所费用强制折扣}
 MTTP 协议要求交易所给交易费强制打一个折扣，折扣大小决定于交易所抵押$MTC$ 代币数量的排名，排名越靠后，折扣越高。假定排名为$n$的折扣为：
+
 $$\lambda_{n} = 0.05\cdot(\ln (n+e-1) - 1)\text{。}$$
 具体返利比例如下表所示：
 
@@ -379,6 +380,7 @@ $$\lambda_{n} = 0.05\cdot(\ln (n+e-1) - 1)\text{。}$$
 1001 &$30.00\%^*$\\
   \end{tabular}
 \caption{抵押$MTC$排名与费用强制折扣} %显示表格的标题
+
 \end{table}
 
 
@@ -389,8 +391,10 @@ $$\lambda_{n} = 0.05\cdot(\ln (n+e-1) - 1)\text{。}$$
 \begin{center}
 \begin{figurehere}
 \includegraphics[height=8cm]{images/exchange-discount.png}
+
 \caption{$MTC$代币抵押排名与费用强制折扣}
 \label{fig:discount}
+
 \end{figurehere}
 \end{center}
 
@@ -439,7 +443,7 @@ message Order {
   uint256 outAmount;  // 卖出ERC20代币数量上限
   uint256 inAmount;   // 买入ERC20代币数量下限
   unit256 expiration  // 过期时间
-  unit256 fee;        // 交易总费用（$MTC$ Token），部分成交的费用按该次
+  unit256 fee;        // 交易总费用（MTC），部分成交的费用按该次
                       // 撮合实际卖出代币额与outAmount比例计算
   uint8 savingShare;  // fee不为0时支付给交易所的分润比例，否则视为100%
   bytes signature;    // 上面数据的ECDSA签名，也可以用作订单ID
@@ -481,6 +485,7 @@ MTTP协议协议可能包含多个智能合约，包括但不限于：
   \item   \textbf{订单合约} 负责更新订单状态以及对取消订单提供支持；
   \item  \textbf{交易所注册合约}  负责维护和更新一系列支持MTTP协议的交易所，为交易所代币抵押和预设参数默认值提供支持；
   \item \textbf{统计合约}  计算任何两个币种之间的成交量，成交价，以及不同交易所的贡献度等指标，以及这些指标的某些滑动平均值。这些指标是订单发起者授权撮合的重要参考依据，同时也可以作为某些预测市场的输入，并且为以后可能的协议拓展（比如对条件单的支持）提供输入（Oracle）。
+
 \end{itemize}
 
 这些合约的具体实现需根据以太坊智能合约语言的限制做适当修改，不排除将上述合约进一步拆解或合并的可能。同时值得指出：MTTP协议中的智能合约是完全开放的，这意味着它们可以被任何的dApp 直接或者间接调用。因此整个协议即使一个完善的整体，又是个开放的，单独可用的组件的集合。
@@ -491,8 +496,8 @@ MTTP协议协议可能包含多个智能合约，包括但不限于：
 以太坊提供通过名字解析地址的以太坊名字服务（Ethereum Name Service, ENS）\cite{hirai2016formal}。我们可以通过使用ENS，将MTTP协议中所有的智能合约，ERC20代币发行地址，交易所收益地址等地址信息映射到相应的名字，一方面可以降低订单信息出错的可能性，另一方面也会减小订单和撮合交易的字节数。
 
 
-
 \section{MTTP协议代币$MTC$\label{sec:protocoltoken}}
+
 
 我们将为MTTP协议发行符合ERC20规范的原生代币，其符号为$MTC$（在本文中用斜体字母表示）。
 
@@ -511,6 +516,7 @@ $MTC$在生态中发挥下列作用：
 
 MTTP协议代币本身遵循ERC20标准，并且在MTTP智能合约的基础上带有原生的流动性 --- 这意味着你不必去传统的交易所购买和出售$MTC$，而是可以通过本文论述的方式，利用MTTP协议本身的去中心化撮合机制，使用任何以太坊上ERC20代币购得$MTC$（订单中的买入代币设定为$MTC$，并将$fee$设为0）。这得益于协议灵活的收费模式。
 
+
 \section{交易所\label{sec:exchange}}
 
 采用MTTP开放协议后，交易所并不能保证每一个撮合都是盈利的。一方面可能是成本过高，因为交易所为了激励矿工优先打包自己的撮合交易到区块链，可能根据预期的收益调高gas，这部分gas是用以太计费的，而以太和撮合中代币的相对价格有可能有超出预期的浮动，从而造成gas实际成本更好。另一方面可能是因为收入没有达到预期，比如交易所把撮合广播到区块链后，该撮合的某个订单的卖出代币被部分或者全部转移到另一个地址，从而造成整个撮合交易未能被确认或实际成交量和手续费过低。类似这样的原因还有很多，因此交易所的每次撮合广播都是根据自己的经验和算法，最大化长期利益的概率游戏。不过也不用担心，实际上交易所和订单发起者是双向选择的关系：交易所只会选择有利可图的订单；而订单发起者只会选择费用最低的交易所 --- 通过参考MTTP统计合约数据决策订单参数。
@@ -527,7 +533,7 @@ MTTP协议代币本身遵循ERC20标准，并且在MTTP智能合约的基础上�
 
 \section{感谢\label{sec:acknowledgement}}
 
-TBD
+我们由衷地感谢下列各位专家对白皮书中内容的审阅和指正，包括：众安-复旦区块链与信息安全联合实验室副主任吴小川、。我们也希望并期待社区中和开源项目的参与者能够对白皮书提出进一步的指导意见。
 
 \newpage
 \bibliography{whitepaper}
@@ -537,10 +543,10 @@ TBD
 
 %\addcontentsline{toc}{part}{附\ 录}
 \begin{appendices}
-
 \section{$MTC$初始代币发行（ICO）\label{sec:ico}}
 
 我们计划发行1亿 MTC代币，8千万发给众售参与者，2千万由MTTP开源项目委员会掌管，服务于众售营销，社区维护，员工增长和未来5年的发展需要。
+
 
 项目预期将于2017年8月份开启前期投资人的pre-ICO和对市场公开的ICO。目标融资金额分别为3000万人民币和5000人民币等值的ETH（是的，我们不接受法币和其它数字代币）。所有众售得来的ETH资金都由MTTP开源项目委员会负责支出。初期的支出计划如下：
 
@@ -583,6 +589,7 @@ TBD
 虽然我们只支持通过ETH众筹，但我们也意识到ETC作为智能合约平台的潜力。因此我们会同时在Ethereum （ETH）和Ethereum Classic（ETC）两条链上同时为众筹的地址发行$MTC$代币。我们不接受ETC 众筹主要是因为无法简单有效对两种资产做兑换率计算，进而可能引发因代币分配不公带来的分歧。
 
 
+
 \subsection{风险提示\label{sec:risks}}
 
 ICO作为一种新的众筹模式，存在着各种不同的风险，参与ICO需要充分意识到这些风险：
@@ -594,6 +601,7 @@ ICO作为一种新的众筹模式，存在着各种不同的风险，参与ICO�
   \item 丢失风险 - 来自众售的资金未获得保险。如果发生丢失事件，或价值损失，将没有公共或私营保险人会提供给购买者保障；
   \item 与$MTC$开发人员雇主公司无关 - $MTC$代币的众售资金并不由任何与相关开发人员的雇主相关或所有。MTTP 开源项目委员会独立实体，有着完全独立的所有权结构；
   \item 失败风险 - 有可能发生的是，由于任何可能的原因，包括但不限于商业关系或营销战略的失败，MTTP平台和所有的众售资金支持的后续营销将不能取得成功。
+
 \end{itemize}
 
 
