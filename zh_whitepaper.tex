@@ -52,7 +52,7 @@
 %\usepackage[pages=some,placement=top]{background}
 \usepackage{eso-pic}
 
-\title{Multilateral Token Trade Protocol (MTTP)\\多边代币交易协议\\v0.6}
+\title{Multilateral Token Trade Protocol (MTTP)\\多边代币交易协议\\v0.7}
 \author{
     daniel@mttp.io\\
     alex@mttp.io\\
@@ -236,7 +236,7 @@ $O_{0\rightarrow 1} \rightarrow \cdots \rightarrow O_{i\rightarrow i\oplus 1} \r
 
 \subsubsection{成交条件和价格\label{sec:matchprice}}
 
-我们由一个长度为3的交易环路为例，介绍环路可成交的条件。假定环路中的三个币种为$C_{0}$、$C_{1}$ 和$C_{2}$，三笔订单分别为：$O_{0\rightarrow 1}$、$O_{1 \rightarrow 2}$和$O_{2 \rightarrow 0}$。很容易证明，如果$r_{0 \rightarrow 1} \cdot r_{1 \rightarrow 2}\cdot r_{2 \rightarrow 0} = 1$时，三个订单都可以用其自身的兑换率成交。当$r_{O \rightarrow 1} \cdot r_{1 \rightarrow 2}\cdot r_{2 \rightarrow 0} > 1$时，三个订单都可以用比自身兑换率更低的兑换率成交。我们称第一种情况为\texttt{原价撮合}，称第二种情况为\texttt{折价撮合}。
+我们由一个长度为3的交易环路为例，介绍环路可成交的条件。假定环路中的三个币种为$C_{0}$、$C_{1}$ 和$C_{2}$，三笔订单分别为：$O_{0\rightarrow 1}$、$O_{1 \rightarrow 2}$和$O_{2 \rightarrow 0}$。很容易证明，如果$r_{0 \rightarrow 1} \cdot r_{1 \rightarrow 2}\cdot r_{2 \rightarrow 0} = 1$时，三个订单都可以用其自身的兑换率成交。当$r_{0 \rightarrow 1} \cdot r_{1 \rightarrow 2}\cdot r_{2 \rightarrow 0} > 1$时，三个订单都可以用比自身兑换率更低的兑换率成交。我们称第一种情况为\texttt{原价撮合}，称第二种情况为\texttt{折价撮合}。
 
 MTTP协议要求交易环路的折价平均分享给环路中的每个订单。假设每笔订单兑换率折价比例为$\gamma$，那么最终完成撮合时，三笔订单的成交价分别为：$r_{0\rightarrow 1} \cdot (1-\gamma)$，$r_{1\rightarrow 2} \cdot (1-\gamma)$，$r_{2 \rightarrow 0} \cdot (1-\gamma)$，并且满足：
 \begin{equation}
@@ -433,11 +433,12 @@ message Order {
 
 交易所可以通过下面的数据结构构建一个交易环路：
 \begin{verbatim}
-message Match {
+message MatchingRing {
     Order[] orders;             // 该次匹配的所有订单
     address feeRecipient;       // 费用收取地址
     unit256 additionalDiscount; // 在费用基础上进行的再折扣价 - eta
     bytes signature;            // 上面数据的ECDSA签名
+    unit256 nunce;              // 一个随机数
 }
 \end{verbatim}
 
