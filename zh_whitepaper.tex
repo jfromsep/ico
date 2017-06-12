@@ -433,12 +433,12 @@ message Order {
 
 交易所可以通过下面的数据结构构建一个交易环路：
 \begin{verbatim}
-message MatchingRing {
+message MatchRing {
     Order[] orders;             // 该次匹配的所有订单
     address feeRecipient;       // 费用收取地址
     unit256 additionalDiscount; // 在费用基础上进行的再折扣价 - eta
     bytes signature;            // 上面数据的ECDSA签名
-    unit256 nunce;              // 一个随机数
+    unit256 nounce;              // 一个随机数
 }
 \end{verbatim}
 
