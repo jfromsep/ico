@@ -514,34 +514,34 @@ Another feature for MTTP is that it has change the "Trading Pair"concept. Transa
 
 
 \begin{table}[hbt]
- \centering
-\begin{tabular}{p{5cm}|p{3.5cm}|p{3cm}} %设置了每一列的宽度, 强制转换.
+  \centering
+\begin{tabular}{p{5cm}|p{2.5cm}|p{2.5cm}} %设置了每一列的宽度，强制转换。
 &Centralized Exchange & MTTP Exchange \\ %用&来分隔单元格的内容 \\表示进入下一行
-  \hline
-Deposit for the order& Yes & No \tablefootnote{MTTP交易所无需托管下单资金 --- 交易用代币存放到自己区块链地址中, 成交前无需要转账.资产丢失或者被盗风险为零.} \\
+    \hline
+Deposit for the order& Yes & No \tablefootnote{Exchanges execute under MTTP ecosystem do not require any deposit - Tokens are kept in user's wallet, no transaction will be made before the full contract close. As a result, no account stolen or asset lost risk.\\
 \hline
-Frozen Account& Yes & No \tablefootnote{MTTP交易所无需冻结下单资金 --- 用户下单后依然可以任意动用账户任何资金, 将资金部分或全部转移走等同于部分或全部撤单.} \\
+Frozen Account& Yes & No \tablefootnote{MTTP exchanges do not require freeze trading fund --- If user partially or fully modify the fund, the contract will be withdraw automatically.}\\
 \hline
-Deposit/Withdraw& Yes & No \tablefootnote{MTTP允许用户的同一个订单被多家MTTP交易所同时撮合, 并可以被多家交易所不同程度部分或全部成交.}\\
+Deposit/Withdraw& Yes & No \tablefootnote{Sender's order can be distributed to multiple receivers partially or fully take under MTTP ecosystem.}\\
 \hline
 
-Internal Trading Risk& Yes & No\tablefootnote{MTTP交易所撮合全部基于区块链智能合约, 数据不可更改, 完全开放透明.}\\
+Internal Trading Risk& Yes & No\tablefootnote{All matching trades are based on smart contract on blockchain, data are immutable and transparent.}\\
 \hline
-Customer loss from exchange closing& Yes & No\tablefootnote{MTTP交易所如果不提供代币发行职责, 交易所倒闭对用户没有任何影响 --- 好比矿工倒闭对区块链账户也没有影响一样.交易所只负责撮合, 清算转账通过智能合约完成.所有资产一直在区块链用户自己的账户里.}\\
+Customer loss from exchange closing& Yes & No\tablefootnote{ MTTP exchanges are not responsible for tokenization, thus MTTP users will not be affected if exchanges wind up. For example, if blockchain account will not affected if the mining terminaed. In conclusion, Exchanges are responsible for matching trades. Smart contract will complete clearing and settlement. Therefore, assets are always kept in user’s blockchain account.}\\
 \hline
-Transaction is the main income& Yes & No\tablefootnote{MTTP交易所的交易手续费为辅助收入, 主要收入为成交的"成本节约分润", 这样会激励撮合价格最优订单.}\\
+Transaction is the main income& Yes & No\table footnote{Transaction fee is not a mainstream income for MTTP exchanges, mainstream comes from “profit of transaction cost saving”, because it can effectively encourage trade matching.}\\
 \hline
-Accept Legal Currency& Yes & Yes\tablefootnote{MTTP交易所对法币的支持是通过资产代币化, 需要将法币在区块链上做ERC20代币发行.}\\
+Accept Legal Currency& Yes & Yes\tablefootnote{MTTP exchanges fully support asset tokenization, hence, it requres legimite currency being tokenised on ERC20 standand.}\\
 \hline
-Can be traded among multiple exchanges& No & Yes \tablefootnote{MTTP允许用户的同一个订单被多家MTTP交易所同时撮合, 并可以被多家交易所不同程度部分或全部成交.}\\
+Can be traded among multiple exchanges& No & Yes \tablefootnote{MTTP allows multiple MTTP exchanges partially or fully trade off one order at same time.}\\
 \hline
-Fairness for Maker and Taker& No & Yes \tablefootnote{MTTP协议要求成交接近中间价, 而不是过度倾向于Maker的价格.}\\
+Fairness for Maker and Taker& No & Yes \tablefootnote{Transaction price is closed to the balance price instead of being tend to maker’s offer price under MTTP protocol.}\\
 \hline
-Mix and Match Trading& No & Yes\tablefootnote{MTTP交易所支持环路发现, 能最大程度找到最好的匹配订单.}\\
+Mix and Match Trading& No & Yes\tablefootnote{ MTTP exchanges’ multiple supporting feature can help sender to find the most profitable order.}\\
 \hline
-Supervision & Strong & Weak\tablefootnote{MTTP交易所不保存资金, 清结算通过开源智能合约完成.因此如果不提供资产和跨链代币发行服务, 监管的必要性很弱.}\\
+Supervision & Strong & Weak\tablefootnote{MTTP exchanges do not require deposit, Clearing and settlement are made through open source smart contract. Hence, regulation is not neccesarily if there's no asset tokenization occured.}\\
 
- \end{tabular}
+  \end{tabular}
 
 \caption{Contrast between centralized exchange and MTTP exchange} %显示表格的标题
 \end{table}
